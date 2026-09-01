@@ -19,15 +19,16 @@ export const jobStore = new Map();
 
 // ── POST /api/render/start ────────────────────────────────────────────────────
 export async function startRender(req, res) {
-  const { scriptId, voice, bgMusicUrl } = req.body;
+  const { scriptId, voice, bgMusicUrl, script: inlineScript } = req.body;
 
   if (!scriptId || typeof scriptId !== 'string') {
     return res.status(400).json({ error: 'scriptId is required' });
   }
 
-  const script = scriptStore.get(scriptId);
+  // Allow passing a full script object directly (bypasses in-memory store — useful for testing)
+  let script = inlineScript || scriptStore.get(scriptId);
   if (!script) {
-    return res.status(404).json({ error: `Script "${scriptId}" not found. Generate a script first.` });
+    return res.status(404).json({ error: `Script "${scriptId}" not found. Re-generate it.` });
   }
 
   // Validate voice

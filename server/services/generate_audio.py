@@ -74,7 +74,9 @@ async def synthesize(text: str, voice: str, audio_path: str, meta_path: str):
         if measured and measured > 0.5:
             duration_sec = round(measured, 3)
     except Exception as e:
-        # If mutagen fails, fall back to last word boundary end + tail
+        # Log mutagen failure to stderr for diagnostics, then fall back
+        print(f'[generate_audio] mutagen failed: {e}', file=sys.stderr)
+        # Fall back to last word boundary end + tail padding
         if subtitles:
             last_end = max(w['end'] for w in subtitles)
             duration_sec = round(last_end + 0.25, 3)
@@ -109,6 +111,10 @@ if __name__ == '__main__':
     try:
         with open(text_file, 'r', encoding='utf-8') as f:
             input_text = f.read()
+        # On Windows, asyncio defaults to ProactorEventLoop which is incompatible
+        # with some edge_tts socket operations — force the compatible selector loop.
+        if sys.platform.startswith('win'):
+            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
         asyncio.run(synthesize(input_text, voice_name, audio_out, meta_out))
     except Exception as exc:
         print(json.dumps({'success': False, 'error': str(exc)}), flush=True)

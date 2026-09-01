@@ -21,7 +21,12 @@ export class SceneModel {
 
     // Visual payload — varies by scene type
     this.payload = {
+      // ── Layout variant — read by every component to pick visual structure ──
+      // Each scene type supports 2–3 named variants (e.g. 'split', 'fullscreen')
+      layout: data.payload?.layout || 'default',
+
       // ── CodeEditorScene ──────────────────────────────────────────────────
+      // layout: 'split' (default) | 'fullscreen'
       code:           data.payload?.code           || '',
       language:       data.payload?.language       || 'javascript',
       filename:       data.payload?.filename       || 'index.js',
@@ -29,6 +34,7 @@ export class SceneModel {
       callout:        data.payload?.callout        || '',
 
       // ── ArchitectureScene ────────────────────────────────────────────────
+      // layout: 'flow' (default) | 'radial'
       // nodes: [{ id, label, icon, status: 'active'|'idle'|'processing'|'success' }]
       nodes:           data.payload?.nodes           || [],
       // connections: [{ from (nodeId), to (nodeId), label }]
@@ -36,29 +42,134 @@ export class SceneModel {
       flowDescription: data.payload?.flowDescription || '',
 
       // ── ConceptCardScene / SummaryScene ─────────────────────────────────
+      // layout: 'stack' (default) | 'grid'
       // bulletPoints: [{ icon, title, description }]
       bulletPoints: data.payload?.bulletPoints || [],
       badges:       data.payload?.badges       || [],
       keyTakeaway:  data.payload?.keyTakeaway  || '',
 
       // ── ComparisonScene ──────────────────────────────────────────────────
-      leftTitle:  data.payload?.leftTitle  || '',
-      leftPoints: data.payload?.leftPoints || [],
-      rightTitle: data.payload?.rightTitle || '',
+      leftTitle:   data.payload?.leftTitle   || '',
+      leftPoints:  data.payload?.leftPoints  || [],
+      rightTitle:  data.payload?.rightTitle  || '',
       rightPoints: data.payload?.rightPoints || [],
 
       // ── TitleScene ───────────────────────────────────────────────────────
+      // layout: 'orbital' (default) | 'minimal'
       topicTag: data.payload?.topicTag || '',
+
+      // ── TimelineScene ────────────────────────────────────────────────────
+      // layout: 'horizontal' | 'vertical'
+      // steps: [{ label, description, icon, timestamp? }]
+      steps: data.payload?.steps || [],
+
+      // ── StatsScene ───────────────────────────────────────────────────────
+      // layout: 'counters' | 'bar'
+      // stats: [{ value, label, icon, suffix? }]
+      stats: data.payload?.stats || [],
+
+      // ── TerminalScene ────────────────────────────────────────────────────
+      // layout: 'typed' | 'split'
+      // commands: [{ prompt, input, output: string[] }]
+      commands:    data.payload?.commands    || [],
+      termTitle:   data.payload?.termTitle   || 'Terminal',
+
+      // ── QuoteScene ───────────────────────────────────────────────────────
+      // layout: 'centered' | 'left-accent'
+      quote:       data.payload?.quote       || '',
+      author:      data.payload?.author      || '',
+      context:     data.payload?.context     || '',
+
+      // ── StepsScene ───────────────────────────────────────────────────────
+      // layout: 'numbered' | 'cards'
+      // steps shared with TimelineScene — same field, different visual treatment
     };
+  }
+
+  /**
+   * Warn (not throw) when required payload fields are missing for the scene type.
+   * Called from validate() so the pipeline always surfaces empty-slide issues.
+   */
+  warnOnEmptyPayload() {
+    const tag = `[SceneModel] ⚠️  Scene "${this.title}" (${this.id}, type: ${this.type})`;
+
+    const checks = {
+      CodeEditorScene: () => {
+        if (!this.payload.code || this.payload.code.trim() === '') {
+          console.warn(`${tag} is missing payload.code — CodeEditorScene will show "// No code provided"`);
+        }
+      },
+      ArchitectureScene: () => {
+        if (!this.payload.nodes || this.payload.nodes.length === 0) {
+          console.warn(`${tag} is missing payload.nodes — ArchitectureScene will render an empty diagram`);
+        }
+        if (!this.payload.connections || this.payload.connections.length === 0) {
+          console.warn(`${tag} is missing payload.connections — no edges will be drawn`);
+        }
+      },
+      ConceptCardScene: () => {
+        if (!this.payload.bulletPoints || this.payload.bulletPoints.length === 0) {
+          console.warn(`${tag} is missing payload.bulletPoints — ConceptCardScene will show no cards`);
+        }
+      },
+      SummaryScene: () => {
+        if (!this.payload.bulletPoints || this.payload.bulletPoints.length === 0) {
+          console.warn(`${tag} is missing payload.bulletPoints — SummaryScene will show no takeaway items`);
+        }
+      },
+      TitleScene: () => {
+        if (!this.payload.badges || this.payload.badges.length === 0) {
+          console.warn(`${tag} is missing payload.badges — TitleScene will show no tag pills`);
+        }
+      },
+      ComparisonScene: () => {
+        if (!this.payload.leftPoints || this.payload.leftPoints.length === 0) {
+          console.warn(`${tag} is missing payload.leftPoints — ComparisonScene left column will be empty`);
+        }
+        if (!this.payload.rightPoints || this.payload.rightPoints.length === 0) {
+          console.warn(`${tag} is missing payload.rightPoints — ComparisonScene right column will be empty`);
+        }
+      },
+      TimelineScene: () => {
+        if (!this.payload.steps || this.payload.steps.length === 0) {
+          console.warn(`${tag} is missing payload.steps — TimelineScene will render empty`);
+        }
+      },
+      StatsScene: () => {
+        if (!this.payload.stats || this.payload.stats.length === 0) {
+          console.warn(`${tag} is missing payload.stats — StatsScene will render empty`);
+        }
+      },
+      TerminalScene: () => {
+        if (!this.payload.commands || this.payload.commands.length === 0) {
+          console.warn(`${tag} is missing payload.commands — TerminalScene will render empty`);
+        }
+      },
+      QuoteScene: () => {
+        if (!this.payload.quote || this.payload.quote.trim() === '') {
+          console.warn(`${tag} is missing payload.quote — QuoteScene will render empty`);
+        }
+      },
+      StepsScene: () => {
+        if (!this.payload.steps || this.payload.steps.length === 0) {
+          console.warn(`${tag} is missing payload.steps — StepsScene will render empty`);
+        }
+      },
+    };
+
+    const checker = checks[this.type];
+    if (checker) checker();
   }
 
   validate() {
     if (!this.narration || this.narration.trim() === '') {
       throw new Error(`Scene "${this.title}" (${this.id}) is missing narration text.`);
     }
+    this.warnOnEmptyPayload();
     return true;
   }
 }
+
 
 // ─── ScriptModel ─────────────────────────────────────────────────────────────
 export class ScriptModel {

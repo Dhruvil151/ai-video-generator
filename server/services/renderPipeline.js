@@ -74,7 +74,7 @@ export async function runRenderPipeline(bullJob, model, script, options = {}) {
         // Strip SSML tags for cache key but pass raw narration to TTS (edge-tts handles SSML)
         // Prefix sceneId with jobId so audio files never collide across concurrent/sequential jobs
         const jobScopedId = `job${jobId}_${scene.id}`;
-        const { audioPath, durationSec, subtitles } = await TTSService.synthesize(
+        const { audioFile, audioPath, durationSec, subtitles } = await TTSService.synthesize(
           scene.narration,
           voice,
           jobScopedId,
@@ -82,7 +82,8 @@ export async function runRenderPipeline(bullJob, model, script, options = {}) {
 
         scene.audioPath         = audioPath;
         // Provide absolute URL so Remotion's internal browser fetches it from our Express API
-        scene.audioUrl          = `http://localhost:${ENV.PORT}/public/audio/${path.basename(audioPath)}`;
+        // Use audioFile (the job-scoped filename) not path.basename(audioPath) which returns the cache hash on hits
+        scene.audioUrl          = `http://localhost:${ENV.PORT}/public/audio/${audioFile}`;
         scene.subtitles         = subtitles || [];
 
         scene.actualDurationSec = durationSec || scene.estimatedDurationSec;
@@ -118,7 +119,10 @@ export async function runRenderPipeline(bullJob, model, script, options = {}) {
         bundleDir,
         fromFrame,
         durationFrames,
-        scenes,           // full scenes array (all props needed for composition layout)
+        // Strip audioUrl from scenes passed to Remotion — we render muted:true and
+        // FFmpeg handles audio in Phase D. This prevents Remotion's headless browser
+        // from trying to download audio assets and getting 404s.
+        scenes: scenes.map(s => ({ ...s, audioUrl: null })),
         bgMusicUrl: null, // no bg music during render — FFmpeg handles it
         outputPath: sceneFile,
       });

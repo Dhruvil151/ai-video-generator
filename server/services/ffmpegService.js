@@ -97,22 +97,28 @@ export async function stitchScenesWithAudio(scenes, outputPath) {
     inputs.push('-i', s.audioPath);
   }
 
-  // Build filter_complex: for each scene pair (v+a), then concat all
+  // Build filter_complex.
+  // FFmpeg concat requires inputs interleaved: [v0][a0][v1][a1]...
+  // NOT grouped: [v0][v1]...[a0][a1]...
   const n = scenes.length;
   const filterParts = [];
 
-  // Trim each audio to the scene's video duration to avoid overflow
+  // Normalize each video + trim each audio to the scene duration
   for (let i = 0; i < n; i++) {
-    const vidIdx = i * 2;     // 0, 2, 4 …
-    const audIdx = i * 2 + 1; // 1, 3, 5 …
-    filterParts.push(`[${vidIdx}:v]setpts=PTS-STARTPTS[v${i}]`);
-    filterParts.push(`[${audIdx}:a]asetpts=PTS-STARTPTS,atrim=0:${scenes[i].durationSec.toFixed(3)}[a${i}]`);
+    const vidIdx = i * 2;      // 0, 2, 4 …
+    const audIdx = i * 2 + 1;  // 1, 3, 5 …
+    filterParts.push(
+      `[${vidIdx}:v]scale=1920:1080:force_original_aspect_ratio=decrease,` +
+      `pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=30,format=yuv420p,setpts=PTS-STARTPTS[v${i}]`
+    );
+    filterParts.push(
+      `[${audIdx}:a]aresample=48000,atrim=0:${scenes[i].durationSec.toFixed(3)},asetpts=PTS-STARTPTS[a${i}]`
+    );
   }
 
-  // Concat all trimmed segments
-  const vInputs = Array.from({ length: n }, (_, i) => `[v${i}]`).join('');
-  const aInputs = Array.from({ length: n }, (_, i) => `[a${i}]`).join('');
-  filterParts.push(`${vInputs}${aInputs}concat=n=${n}:v=1:a=1[vout][aout]`);
+  // Interleave inputs for concat: [v0][a0][v1][a1]...concat=n=N:v=1:a=1
+  const interleavedInputs = Array.from({ length: n }, (_, i) => `[v${i}][a${i}]`).join('');
+  filterParts.push(`${interleavedInputs}concat=n=${n}:v=1:a=1[vout][aout]`);
 
   const filterComplex = filterParts.join(';');
 
@@ -122,10 +128,13 @@ export async function stitchScenesWithAudio(scenes, outputPath) {
     '-filter_complex', filterComplex,
     '-map', '[vout]',
     '-map', '[aout]',
-    '-c:v', 'copy',
+    '-c:v', 'libx264',
+    '-preset', 'fast',
+    '-crf', '18',
     '-c:a', 'aac',
     '-b:a', '128k',
     '-ar', '48000',
+    '-movflags', '+faststart',
     outputPath
   );
 

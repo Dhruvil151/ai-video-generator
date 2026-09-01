@@ -18,13 +18,7 @@ const execFileAsync = promisify(execFile);
  */
 async function measureMp3Duration(audioPath) {
   try {
-    // Find the ffprobe binary bundled with @remotion
-    const { stdout, stderr } = await execFileAsync('node', [
-      '-e',
-      `const g = (await import(String.raw\`file:///\` + String.raw\`${process.cwd().replace(/\\/g,\"/\")}/node_modules/@remotion/compositor-win32-x64-msvc/ffprobe.exe\`)).default; console.log(g);`,
-    ]).catch(() => ({ stdout: '', stderr: '' }));
-
-    // Fallback: find ffprobe.exe directly
+    // Find ffprobe.exe bundled with @remotion
     const ffprobePaths = [
       path.join(ENV.ROOT_DIR, 'node_modules', '@remotion', 'compositor-win32-x64-msvc', 'ffprobe.exe'),
     ];
@@ -79,7 +73,7 @@ export class TTSService {
         fs.copyFileSync(cached.audioPath, destPath);
       }
       console.log(`[TTS] Cache hit: ${cacheKey} → ${audioFile}`);
-      return { ...cached, audioFile, audioUrl: `/public/audio/${audioFile}` };
+      return { ...cached, audioFile, audioPath: destPath, audioUrl: `/public/audio/${audioFile}` };
     }
 
     // ── Synthesize with retry ────────────────────────────────────────────────
