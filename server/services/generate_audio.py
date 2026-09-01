@@ -44,7 +44,6 @@ async def synthesize(text: str, voice: str, audio_path: str, meta_path: str):
     communicate = edge_tts.Communicate(text=clean, voice=voice)
 
     subtitles = []
-    last_end_sec = 0.0
 
     with open(audio_path, 'wb') as audio_file:
         async for chunk in communicate.stream():
@@ -63,11 +62,23 @@ async def synthesize(text: str, voice: str, audio_path: str, meta_path: str):
                     'startMs': round(start_sec * 1000),
                     'endMs':   round(end_sec * 1000),
                 })
-                if end_sec > last_end_sec:
-                    last_end_sec = end_sec
 
-    # Duration = last word end + small tail silence
-    duration_sec = round(last_end_sec + 0.25, 3) if subtitles else 5.0
+    # ── Measure real duration from the MP3 file (authoritative) ──────────────
+    # Using mutagen is far more reliable than word boundary timestamps, which
+    # Edge-TTS sometimes omits for certain voices or narration styles.
+    duration_sec = 5.0  # safe fallback
+    try:
+        from mutagen.mp3 import MP3
+        audio_info = MP3(audio_path)
+        measured = audio_info.info.length
+        if measured and measured > 0.5:
+            duration_sec = round(measured, 3)
+    except Exception as e:
+        # If mutagen fails, fall back to last word boundary end + tail
+        if subtitles:
+            last_end = max(w['end'] for w in subtitles)
+            duration_sec = round(last_end + 0.25, 3)
+        # else keep the 5.0 fallback
 
     result = {
         'audioFile':   os.path.basename(audio_path),

@@ -1,12 +1,49 @@
 import path from 'path';
 import fs from 'fs';
-import { spawn } from 'child_process';
+import { spawn, execFile } from 'child_process';
+import { promisify } from 'util';
 import { fileURLToPath } from 'url';
 import { ENV } from '../config/env.js';
 import { VIDEO_CONFIG, TTS_MAX_RETRIES, TTS_BASE_DELAY_MS, DEFAULT_VOICE } from '../config/constants.js';
 import { ttsCacheKey } from '../utils/hashHelper.js';
 import { CacheService } from './cacheService.js';
 import { ensureDirectories } from '../utils/fileHelper.js';
+
+const execFileAsync = promisify(execFile);
+
+/**
+ * Node-side safety net: if the Python bridge returns a suspiciously short
+ * duration (≤ 6.5s), measure the actual MP3 duration via ffprobe.
+ * This guards against mutagen failures or edge-tts stream oddities.
+ */
+async function measureMp3Duration(audioPath) {
+  try {
+    // Find the ffprobe binary bundled with @remotion
+    const { stdout, stderr } = await execFileAsync('node', [
+      '-e',
+      `const g = (await import(String.raw\`file:///\` + String.raw\`${process.cwd().replace(/\\/g,\"/\")}/node_modules/@remotion/compositor-win32-x64-msvc/ffprobe.exe\`)).default; console.log(g);`,
+    ]).catch(() => ({ stdout: '', stderr: '' }));
+
+    // Fallback: find ffprobe.exe directly
+    const ffprobePaths = [
+      path.join(ENV.ROOT_DIR, 'node_modules', '@remotion', 'compositor-win32-x64-msvc', 'ffprobe.exe'),
+    ];
+    const ffprobeBin = ffprobePaths.find(p => fs.existsSync(p));
+    if (!ffprobeBin) return null;
+
+    const { stdout: out } = await execFileAsync(ffprobeBin, [
+      '-v', 'quiet',
+      '-print_format', 'json',
+      '-show_format',
+      audioPath,
+    ]);
+    const data = JSON.parse(out);
+    const dur = parseFloat(data?.format?.duration);
+    return isFinite(dur) && dur > 0 ? Math.round(dur * 1000) / 1000 : null;
+  } catch {
+    return null;
+  }
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = path.dirname(__filename);
@@ -64,8 +101,20 @@ export class TTSService {
       try {
         const result = await this._runPythonBridge(textPath, voice, audioPath, metaPath);
 
-        // Add scene transition padding to raw duration
-        const paddedDuration = result.durationSec + VIDEO_CONFIG.SCENE_TRANSITION_PADDING_SEC;
+        // ── Node-side duration guard ──────────────────────────────────────────
+        // If Python reports ≤ 6.5s it likely means mutagen also failed.
+        // Measure directly with ffprobe as a backstop.
+        let trueDuration = result.durationSec;
+        if (trueDuration <= 6.5 && fs.existsSync(audioPath)) {
+          const measured = await measureMp3Duration(audioPath);
+          if (measured && measured > trueDuration) {
+            console.log(`[TTS] ⚠ Duration override: Python reported ${trueDuration}s → ffprobe measured ${measured}s`);
+            trueDuration = measured;
+          }
+        }
+
+        // Add scene transition padding to the real duration
+        const paddedDuration = trueDuration + VIDEO_CONFIG.SCENE_TRANSITION_PADDING_SEC;
         const finalResult = {
           audioFile,
           audioPath,

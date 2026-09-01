@@ -77,6 +77,62 @@ export async function concatenateScenes(scenePaths, outputPath) {
 }
 
 /**
+ * Concatenate muted scene MP4s and mix each scene's TTS audio in one FFmpeg pass.
+ *
+ * Since Remotion now renders video-only (muted: true), this function:
+ * 1. Builds a concat list of video-only scene chunks.
+ * 2. Adds each scene's MP3 audio as a separate input, trimmed to its scene duration.
+ * 3. Concatenates video + audio together using the FFmpeg concat filter.
+ *
+ * @param {Array<{videoPath: string, audioPath: string, durationSec: number}>} scenes
+ * @param {string} outputPath - final stitched MP4 (video + TTS audio, no bg music yet)
+ */
+export async function stitchScenesWithAudio(scenes, outputPath) {
+  if (scenes.length === 0) throw new Error('No scenes provided to stitch');
+
+  // Build input flags: alternating -i video -i audio for each scene
+  const inputs = [];
+  for (const s of scenes) {
+    inputs.push('-i', s.videoPath);
+    inputs.push('-i', s.audioPath);
+  }
+
+  // Build filter_complex: for each scene pair (v+a), then concat all
+  const n = scenes.length;
+  const filterParts = [];
+
+  // Trim each audio to the scene's video duration to avoid overflow
+  for (let i = 0; i < n; i++) {
+    const vidIdx = i * 2;     // 0, 2, 4 …
+    const audIdx = i * 2 + 1; // 1, 3, 5 …
+    filterParts.push(`[${vidIdx}:v]setpts=PTS-STARTPTS[v${i}]`);
+    filterParts.push(`[${audIdx}:a]asetpts=PTS-STARTPTS,atrim=0:${scenes[i].durationSec.toFixed(3)}[a${i}]`);
+  }
+
+  // Concat all trimmed segments
+  const vInputs = Array.from({ length: n }, (_, i) => `[v${i}]`).join('');
+  const aInputs = Array.from({ length: n }, (_, i) => `[a${i}]`).join('');
+  filterParts.push(`${vInputs}${aInputs}concat=n=${n}:v=1:a=1[vout][aout]`);
+
+  const filterComplex = filterParts.join(';');
+
+  await ffmpeg(
+    '-y',
+    ...inputs,
+    '-filter_complex', filterComplex,
+    '-map', '[vout]',
+    '-map', '[aout]',
+    '-c:v', 'copy',
+    '-c:a', 'aac',
+    '-b:a', '128k',
+    '-ar', '48000',
+    outputPath
+  );
+
+  console.log(`[FFmpeg] Stitched ${n} scenes with audio → ${path.basename(outputPath)}`);
+}
+
+/**
  * Mix background music onto an already-rendered video with audio ducking.
  *
  * The final mix:
@@ -148,27 +204,33 @@ export async function mixBackgroundMusic({
  * @param {number} fadeSec - duration of fade in/out in seconds
  */
 export async function applyFades(inputPath, outputPath, fadeSec = 0.5) {
-  // Get duration first
-  const { stdout } = await execFileAsync(ffmpegPath, [
-    '-i', inputPath,
-    '-f', 'null', '-'
-  ]).catch(err => ({ stdout: '', stderr: err.stderr || '' }));
-
-  // Extract duration from stderr (ffmpeg writes stats to stderr)
-  // If we can't get duration, skip fades
+  // Get duration via ffmpeg — it writes stats to STDERR (not stdout)
   let duration = null;
-  const match = (stdout + '').match(/Duration: (\d+):(\d+):(\d+\.\d+)/);
-  if (match) {
-    duration = parseInt(match[1]) * 3600 + parseInt(match[2]) * 60 + parseFloat(match[3]);
+  try {
+    await execFileAsync(ffmpegPath, ['-i', inputPath, '-f', 'null', '-']);
+  } catch (err) {
+    // ffmpeg exits non-zero for -f null; capture stderr for the Duration line
+    const output = (err.stderr || '') + (err.stdout || '');
+    const match = output.match(/Duration: (\d+):(\d+):(\d+\.\d+)/);
+    if (match) {
+      duration = parseInt(match[1]) * 3600 + parseInt(match[2]) * 60 + parseFloat(match[3]);
+    }
   }
 
   if (!duration) {
+    console.warn('[FFmpeg] applyFades: could not determine duration — copying without fades');
     fs.copyFileSync(inputPath, outputPath);
     return;
   }
 
   const fadeOutStart = Math.max(0, duration - fadeSec);
-  const vf = `fade=t=in:st=0:d=${fadeSec},fade=t=out:st=${fadeOutStart.toFixed(2)}:d=${fadeSec}`;
+  const vf = [
+    `fade=t=in:st=0:d=${fadeSec}`,
+    `fade=t=out:st=${fadeOutStart.toFixed(2)}:d=${fadeSec}`,
+    // Fix E: normalize color space to broadcast standard (yuv420p + bt709)
+    'format=yuv420p',
+  ].join(',');
+
   const af = `afade=t=in:st=0:d=${fadeSec},afade=t=out:st=${fadeOutStart.toFixed(2)}:d=${fadeSec}`;
 
   await ffmpeg(
@@ -176,15 +238,22 @@ export async function applyFades(inputPath, outputPath, fadeSec = 0.5) {
     '-i', inputPath,
     '-vf', vf,
     '-af', af,
+    // Fix F: enforce uniform 30fps output
+    '-r', '30',
     '-c:v', 'libx264',
     '-preset', 'fast',
     '-crf', '18',
+    // Fix E: set color space metadata
+    '-color_range', 'tv',
+    '-colorspace', 'bt709',
+    '-color_primaries', 'bt709',
+    '-color_trc', 'bt709',
     '-c:a', 'aac',
-    '-b:a', '192k',
+    '-b:a', '128k',
     outputPath
   );
 
-  console.log(`[FFmpeg] Fades applied (${fadeSec}s) → ${path.basename(outputPath)}`);
+  console.log(`[FFmpeg] Fades + color normalisation applied (${fadeSec}s) → ${path.basename(outputPath)}`);
 }
 
 /**

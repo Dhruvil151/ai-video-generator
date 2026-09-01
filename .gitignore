@@ -31,3 +31,6 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+
+# Ensure bundled fonts are committed (needed for offline Remotion render)
+!src/remotion/fonts/
