@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Environment variables (NEVER commit this)
+.env
+.env.local
+.env.*.local
+
+# Generated outputs (large binary files)
+public/audio/
+public/output/
+
+# TTS & scene cache
+cache/tts/
+cache/scenes/
+
+# Temporary render files
+temp/phase4_frames/
+
+# Remotion webpack bundles (generated at runtime)
+remotion-webpack-bundle-*
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

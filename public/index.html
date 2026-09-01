@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Video Generator</title>
+  
+  <!-- Modern Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body>
+  <!-- Decorative background elements -->
+  <div class="bg-shape shape-1"></div>
+  <div class="bg-shape shape-2"></div>
+  
+  <main class="container">
+    <header class="glass-panel text-center">
+      <h1 class="gradient-text">AI Video Generator</h1>
+      <p class="subtitle">Turn any topic into a stunning educational video in minutes.</p>
+    </header>
+
+    <section id="input-section" class="glass-panel animate-fade-in">
+      <form id="generate-form">
+        <div class="form-group">
+          <label for="topic">What should the video be about?</label>
+          <input type="text" id="topic" placeholder="e.g., The History of the Internet, JavaScript Promises..." required autofocus autocomplete="off">
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group half">
+            <label for="mode">Detail Level</label>
+            <div class="select-wrapper">
+              <select id="mode">
+                <option value="short">Short (5 scenes, ~1.5 mins)</option>
+                <option value="detailed">Detailed (10 scenes, ~3 mins)</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-group half">
+            <label for="voice">Voice Actor</label>
+            <div class="select-wrapper">
+              <select id="voice">
+                <option value="en-US-ChristopherNeural">Christopher (Male, Professional)</option>
+                <option value="en-US-AriaNeural">Aria (Female, Engaging)</option>
+                <option value="en-US-GuyNeural">Guy (Male, Casual)</option>
+                <option value="en-GB-SoniaNeural">Sonia (Female, British)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" id="submit-btn" class="primary-btn">
+          <span class="btn-text">Generate Video</span>
+          <span class="btn-loader hidden"></span>
+        </button>
+      </form>
+    </section>
+
+    <!-- Progress Section (Hidden by default) -->
+    <section id="progress-section" class="glass-panel hidden">
+      <div class="progress-header">
+        <h2 id="progress-title">Generating Script...</h2>
+        <span id="progress-percentage">0%</span>
+      </div>
+      
+      <div class="progress-track">
+        <div id="progress-bar" class="progress-fill"></div>
+      </div>
+      
+      <p id="progress-step" class="progress-message">Connecting to AI model...</p>
+    </section>
+
+    <!-- Result Section (Hidden by default) -->
+    <section id="result-section" class="glass-panel hidden">
+      <h2>Your Video is Ready! 🎉</h2>
+      <div class="video-container">
+        <video id="output-video" controls playsinline>
+          Your browser does not support the video tag.
+        </video>
+      </div>
+      <div class="actions">
+        <a id="download-btn" href="#" download class="secondary-btn">Download Video</a>
+        <button id="create-another-btn" class="text-btn">Create Another</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Error Toast -->
+  <div id="toast" class="toast hidden">
+    <div class="toast-icon">⚠️</div>
+    <div id="toast-message" class="toast-message">An error occurred.</div>
+  </div>
+
+  <script src="/public/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: aivg_redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Optional: Redis GUI — open http://localhost:8001
+  redisinsight:
+    image: redislabs/redisinsight:latest
+    container_name: aivg_redisinsight
+    restart: unless-stopped
+    ports:
+      - '8001:5540'
+    depends_on:
+      - redis
+    profiles:
+      - debug
+
+volumes:
+  redis_data:
