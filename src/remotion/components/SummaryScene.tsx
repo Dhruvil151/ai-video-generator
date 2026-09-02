@@ -1,8 +1,7 @@
-import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate, spring } from 'remotion';
+﻿import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate, spring } from 'remotion';
 import React from 'react';
 import { BackgroundGradients } from './BackgroundGradients';
-import { SubtitlesOverlay, estimateSubtitles } from './SubtitlesOverlay';
-import { AudioMixer } from './AudioMixer';
+// SubtitlesOverlay removed â€” word-level sync unavailable from edge-tts 7.x (no WordBoundary events)
 import '../styles/video.css';
 
 interface SummarySceneProps {
@@ -28,12 +27,14 @@ export const SummaryScene: React.FC<SummarySceneProps> = ({ scene, bgMusicUrl })
   const durationSec = scene.actualDurationSec || scene.estimatedDurationSec || 10;
   const totalFrames = Math.ceil(durationSec * fps);
 
-  const points   = scene.payload?.bulletPoints || [];
+  const rawPoints = scene.payload?.bulletPoints || [];
+  const points = rawPoints.length > 0 ? rawPoints : (() => {
+    const sentences = (scene.narration || '').replace(/<[^>]+>/g,'').split(/[.!?]+/).map(s=>s.trim()).filter(s=>s.length>12).slice(0,3);
+    return sentences.map((s,i) => ({ title: `Takeaway ${i+1}`, description: s }));
+  })();
   const takeaway = scene.payload?.keyTakeaway || '';
 
-  const subtitles = (scene.subtitles && scene.subtitles.length > 0)
-    ? scene.subtitles
-    : estimateSubtitles(scene.narration, durationSec);
+  // Subtitles removed â€” will be re-enabled when real word timestamps are available
 
   const headerSpring  = spring({ frame, fps, config: { damping: 24, stiffness: 120 }, delay: 0 });
   const takeawaySpring = spring({ frame, fps, config: { damping: 16, stiffness: 60 }, delay: 35 + points.length * 7 });
@@ -89,7 +90,7 @@ export const SummaryScene: React.FC<SummarySceneProps> = ({ scene, bgMusicUrl })
                 opacity: checkProgress,
                 transform: `scale(${interpolate(checkProgress, [0, 1], [0.5, 1])})`,
               }}>
-                ✓
+                âœ“
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{
@@ -105,7 +106,7 @@ export const SummaryScene: React.FC<SummarySceneProps> = ({ scene, bgMusicUrl })
         })}
       </div>
 
-      {/* Final takeaway banner — grand entrance */}
+      {/* Final takeaway banner â€” grand entrance */}
       {takeaway && (
         <div style={{
           margin: '0 80px 60px',
@@ -129,7 +130,7 @@ export const SummaryScene: React.FC<SummarySceneProps> = ({ scene, bgMusicUrl })
             maskComposite: 'exclude',
             pointerEvents: 'none',
           }} />
-          <div style={{ fontSize: '36px', marginBottom: '12px' }}>🚀</div>
+          <div style={{ fontSize: '36px', marginBottom: '12px' }}>ðŸš€</div>
           <div style={{
             fontFamily: "'Outfit', sans-serif", fontSize: '34px', fontWeight: 700,
             background: 'linear-gradient(135deg, #00D9FF, #8B5CF6)',
@@ -141,9 +142,7 @@ export const SummaryScene: React.FC<SummarySceneProps> = ({ scene, bgMusicUrl })
         </div>
       )}
 
-      <SubtitlesOverlay subtitles={subtitles} />
-      <AudioMixer voiceoverUrl={scene.audioUrl || null} bgMusicUrl={bgMusicUrl || null}
-        subtitles={subtitles} sceneDurationSec={durationSec} />
+      {/* SubtitlesOverlay + AudioMixer removed â€” will be re-added with real word timestamps */}
 
       <div className="progress-bar" style={{
         width: `${interpolate(frame, [0, totalFrames], [0, 100])}%`,
@@ -151,3 +150,4 @@ export const SummaryScene: React.FC<SummarySceneProps> = ({ scene, bgMusicUrl })
     </AbsoluteFill>
   );
 };
+

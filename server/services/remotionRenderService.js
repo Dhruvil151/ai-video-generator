@@ -93,8 +93,7 @@ export async function renderScene({
       concurrency,
       imageFormat: 'jpeg',
       jpegQuality: 88,
-      // Mute audio here — FFmpeg handles the final audio mix separately
-      muted: false,
+      muted: true,   // FFmpeg handles the final audio mix in renderPipeline.js — do NOT bake audio here
       logLevel: 'warn',
     });
   } catch (err) {

@@ -6,6 +6,11 @@ import { ArchitectureScene } from './components/ArchitectureScene';
 import { ConceptCardScene }  from './components/ConceptCardScene';
 import { ComparisonScene }   from './components/ComparisonScene';
 import { SummaryScene }      from './components/SummaryScene';
+import { TimelineScene }     from './components/TimelineScene';
+import { StatsScene }        from './components/StatsScene';
+import { TerminalScene }     from './components/TerminalScene';
+import { QuoteScene }        from './components/QuoteScene';
+import { StepsScene }        from './components/StepsScene';
 import './styles/video.css';
 
 export interface VideoScene {
@@ -28,12 +33,17 @@ export interface EducationalVideoProps {
 }
 
 const SCENE_COMPONENTS: Record<string, React.ComponentType<any>> = {
-  TitleScene:        TitleScene,
-  CodeEditorScene:   CodeEditorScene,
-  ArchitectureScene: ArchitectureScene,
-  ConceptCardScene:  ConceptCardScene,
-  ComparisonScene:   ComparisonScene,
-  SummaryScene:      SummaryScene,
+  TitleScene,
+  CodeEditorScene,
+  ArchitectureScene,
+  ConceptCardScene,
+  ComparisonScene,
+  SummaryScene,
+  TimelineScene,
+  StatsScene,
+  TerminalScene,
+  QuoteScene,
+  StepsScene,
 };
 
 export const EducationalVideo: React.FC<EducationalVideoProps> = ({ scenes, bgMusicUrl }) => {

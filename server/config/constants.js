@@ -34,6 +34,12 @@ export const SCENE_TYPES = {
   CONCEPT_CARD: 'ConceptCardScene',
   COMPARISON:   'ComparisonScene',
   SUMMARY:      'SummaryScene',
+  // ── New scene types ───────────────────────────────────────────────────────
+  TIMELINE:     'TimelineScene',   // sequential steps / chronological flow
+  STATS:        'StatsScene',      // animated numbers / metrics / benchmarks
+  TERMINAL:     'TerminalScene',   // CLI commands / shell output / npm
+  QUOTE:        'QuoteScene',      // single impactful principle / law / rule
+  STEPS:        'StepsScene',      // numbered how-to / setup / algorithm
 };
 
 // ─── BullMQ Queue ────────────────────────────────────────────────────────────
@@ -53,12 +59,18 @@ export const VIDEO_MODES = {
   short: {
     label: 'Short Explainer',
     targetMinutes: 2,
+    // Gemini picks the actual count within this range based on topic complexity
+    minScenes: 4,
+    maxScenes: 8,
+    // Legacy fallback used by estimate() only
     sceneCount: 5,
     description: 'Fast-paced overview covering the key concepts.',
   },
   detailed: {
     label: 'Detailed Deep Dive',
     targetMinutes: 8,
+    minScenes: 8,
+    maxScenes: 14,
     sceneCount: 10,
     description: 'Multi-chapter breakdown with architecture, code walkthroughs, and internals.',
   },

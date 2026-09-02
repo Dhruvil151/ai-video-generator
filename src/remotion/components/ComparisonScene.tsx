@@ -1,8 +1,7 @@
 import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate, spring } from 'remotion';
 import React from 'react';
 import { BackgroundGradients } from './BackgroundGradients';
-import { SubtitlesOverlay, estimateSubtitles } from './SubtitlesOverlay';
-import { AudioMixer } from './AudioMixer';
+// SubtitlesOverlay removed — word-level sync unavailable from edge-tts 7.x (no WordBoundary events)
 import '../styles/video.css';
 
 interface ComparisonSceneProps {
@@ -16,12 +15,27 @@ interface ComparisonSceneProps {
     subtitles?: any[];
     payload?: {
       leftTitle?: string;
-      leftPoints?: string[];
+      leftPoints?: Array<string | { text: string }>;
       rightTitle?: string;
-      rightPoints?: string[];
+      rightPoints?: Array<string | { text: string }>;
     };
   };
   bgMusicUrl?: string | null;
+}
+
+// Normalize: accept both string[] and {text:string}[] from Gemini
+function normalizePoints(pts: Array<string | { text: string }> | undefined, fallbackNarration: string, side: 'left' | 'right'): string[] {
+  const raw = pts || [];
+  const normalized = raw.map(p => typeof p === 'string' ? p : (p as any).text || String(p)).filter(Boolean);
+  if (normalized.length > 0) return normalized;
+  // Fallback: split narration into bullet sentences
+  const sentences = fallbackNarration
+    .replace(/<[^>]+>/g, '')
+    .split(/[.!?]+/)
+    .map(s => s.trim())
+    .filter(s => s.length > 10);
+  const half = Math.ceil(sentences.length / 2);
+  return side === 'left' ? sentences.slice(0, half) : sentences.slice(half, half + 3);
 }
 
 export const ComparisonScene: React.FC<ComparisonSceneProps> = ({ scene, bgMusicUrl }) => {
@@ -32,13 +46,11 @@ export const ComparisonScene: React.FC<ComparisonSceneProps> = ({ scene, bgMusic
 
   const leftTitle  = scene.payload?.leftTitle  || 'Before';
   const rightTitle = scene.payload?.rightTitle || 'After';
-  const leftPts    = scene.payload?.leftPoints  || [];
-  const rightPts   = scene.payload?.rightPoints || [];
+  const leftPts    = normalizePoints(scene.payload?.leftPoints,  scene.narration, 'left');
+  const rightPts   = normalizePoints(scene.payload?.rightPoints, scene.narration, 'right');
   const maxItems   = Math.max(leftPts.length, rightPts.length);
 
-  const subtitles = (scene.subtitles && scene.subtitles.length > 0)
-    ? scene.subtitles
-    : estimateSubtitles(scene.narration, durationSec);
+  // Subtitles removed — will be re-enabled when real word timestamps are available
 
   const headerSpring = spring({ frame, fps, config: { damping: 24, stiffness: 120 }, delay: 0 });
   const leftSpring   = spring({ frame, fps, config: { damping: 20, stiffness: 90 }, delay: 10 });
@@ -154,9 +166,7 @@ export const ComparisonScene: React.FC<ComparisonSceneProps> = ({ scene, bgMusic
         </div>
       </div>
 
-      <SubtitlesOverlay subtitles={subtitles} />
-      <AudioMixer voiceoverUrl={scene.audioUrl || null} bgMusicUrl={bgMusicUrl || null}
-        subtitles={subtitles} sceneDurationSec={durationSec} />
+      {/* SubtitlesOverlay + AudioMixer removed — will be re-added with real word timestamps */}
 
       <div className="progress-bar" style={{
         width: `${interpolate(frame, [0, totalFrames], [0, 100])}%`,

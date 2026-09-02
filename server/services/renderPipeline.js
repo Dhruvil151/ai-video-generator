@@ -25,7 +25,7 @@ import path from 'path';
 import { ENV } from '../config/env.js';
 import { TTSService } from './ttsService.js';
 import { bundleComposition, renderScene, computeSceneTimings } from './remotionRenderService.js';
-import { concatenateScenes, mixBackgroundMusic, applyFades } from './ffmpegService.js';
+import { stitchScenesWithAudio, mixBackgroundMusic, applyFades } from './ffmpegService.js';
 import { cleanJobTemp, getJobTempDir } from '../utils/fileHelper.js';
 import { JOB_STATUS } from '../models/RenderJob.js';
 
@@ -72,15 +72,18 @@ export async function runRenderPipeline(bullJob, model, script, options = {}) {
 
       const results = await Promise.all(batch.map(async scene => {
         // Strip SSML tags for cache key but pass raw narration to TTS (edge-tts handles SSML)
-        const { audioPath, durationSec, subtitles } = await TTSService.synthesize(
+        // Prefix sceneId with jobId so audio files never collide across concurrent/sequential jobs
+        const jobScopedId = `job${jobId}_${scene.id}`;
+        const { audioFile, audioPath, durationSec, subtitles } = await TTSService.synthesize(
           scene.narration,
           voice,
-          scene.id,
+          jobScopedId,
         );
 
         scene.audioPath         = audioPath;
         // Provide absolute URL so Remotion's internal browser fetches it from our Express API
-        scene.audioUrl          = `http://localhost:${ENV.PORT}/public/audio/${path.basename(audioPath)}`;
+        // Use audioFile (the job-scoped filename) not path.basename(audioPath) which returns the cache hash on hits
+        scene.audioUrl          = `http://localhost:${ENV.PORT}/public/audio/${audioFile}`;
         scene.subtitles         = subtitles || [];
 
         scene.actualDurationSec = durationSec || scene.estimatedDurationSec;
@@ -116,7 +119,10 @@ export async function runRenderPipeline(bullJob, model, script, options = {}) {
         bundleDir,
         fromFrame,
         durationFrames,
-        scenes,           // full scenes array (all props needed for composition layout)
+        // Strip audioUrl from scenes passed to Remotion — we render muted:true and
+        // FFmpeg handles audio in Phase D. This prevents Remotion's headless browser
+        // from trying to download audio assets and getting 404s.
+        scenes: scenes.map(s => ({ ...s, audioUrl: null })),
         bgMusicUrl: null, // no bg music during render — FFmpeg handles it
         outputPath: sceneFile,
       });
@@ -126,11 +132,18 @@ export async function runRenderPipeline(bullJob, model, script, options = {}) {
       console.log(`[Pipeline] ✓ Scene ${i + 1}/${scenes.length} rendered → ${path.basename(sceneFile)}`);
     }
 
-    // ── Phase D: Stitch ────────────────────────────────────────────────────────
-    await reportProgress(bullJob, model, JOB_STATUS.STITCHING, 70, 'Concatenating scene videos…');
+    // ── Phase D: Stitch ───────────────────────────────────────────────────────────
+    await reportProgress(bullJob, model, JOB_STATUS.STITCHING, 70, 'Concatenating scene videos with audio…');
+
+    // Build scene descriptor array: { videoPath, audioPath, durationSec } per scene
+    const sceneDescriptors = timings.map(({ scene }, i) => ({
+      videoPath:   scenePaths[i],
+      audioPath:   scene.audioPath,
+      durationSec: scene.actualDurationSec || scene.estimatedDurationSec || 10,
+    }));
 
     const concatPath = path.join(tempDir, 'raw_concat.mp4');
-    await concatenateScenes(scenePaths, concatPath);
+    await stitchScenesWithAudio(sceneDescriptors, concatPath);
 
     // Determine final output filename
     const slug       = script.topic.toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 32);
@@ -162,7 +175,7 @@ export async function runRenderPipeline(bullJob, model, script, options = {}) {
     cleanJobTemp(jobId);
 
     // ── Done ───────────────────────────────────────────────────────────────────
-    const outputUrl  = `/output/${outputFile}`;
+    const outputUrl  = `/public/output/${outputFile}`;
     if (model) {
       model.outputVideoPath = outputPath;
       model.outputVideoUrl  = outputUrl;
