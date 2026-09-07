@@ -1,0 +1,8 @@
+{
+  "ignore": [
+    "temp/*",
+    "cache/*",
+    "public/*",
+    "src/remotion/public/*"
+  ]
+}

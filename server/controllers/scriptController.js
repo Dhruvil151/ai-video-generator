@@ -1,6 +1,6 @@
 import { GeminiService } from '../services/geminiService.js';
 import { VIDEO_MODES } from '../config/constants.js';
-import { formatDuration, estimateNarrationDuration } from '../utils/durationCalculator.js';
+import { formatDuration } from '../utils/durationCalculator.js';
 
 // In-memory script store (Phase 5 will persist to Redis)
 export const scriptStore = new Map();
@@ -68,7 +68,7 @@ export class ScriptController {
       });
 
       const elapsed = Date.now() - t0;
-      console.log(`[ScriptController] Script generated in ${elapsed}ms — ${script.scenes.length} scenes, ~${formatDuration(script.estimatedTotalDurationSec)}`);
+      console.log(`[ScriptController] Script generated in ${elapsed}ms — ${script.sections.length} sections, ${script.scenes.length} visuals, ~${formatDuration(script.estimatedTotalDurationSec)}`);
 
       // Store in memory so the render controller can retrieve it by ID
       scriptStore.set(script.id, script);
@@ -112,20 +112,21 @@ export class ScriptController {
       return res.status(404).json({ error: `Script "${scriptId}" not found.` });
     }
 
-    const scene = script.scenes.find(s => s.id === sceneId);
-    if (!scene) {
+    // Find which section owns this visual
+    const section = script.sections.find(s => s.visuals.some(v => v.id === sceneId));
+    const scene   = section?.visuals.find(v => v.id === sceneId);
+    if (!scene || !section) {
       return res.status(404).json({ error: `Scene "${sceneId}" not found in script "${scriptId}".` });
     }
 
-    // Apply allowed updates
-    if (updates.narration !== undefined) scene.narration  = updates.narration;
-    if (updates.title     !== undefined) scene.title      = updates.title;
-    if (updates.subtitle  !== undefined) scene.subtitle   = updates.subtitle;
-    if (updates.payload   !== undefined) scene.payload    = { ...scene.payload, ...updates.payload };
+    // Apply allowed updates — narration belongs to the section, not the visual
+    if (updates.narration !== undefined) section.narration = updates.narration;
+    if (updates.title     !== undefined) scene.title       = updates.title;
+    if (updates.subtitle  !== undefined) scene.subtitle    = updates.subtitle;
+    if (updates.payload   !== undefined) scene.payload     = { ...scene.payload, ...updates.payload };
 
     // Recalculate estimated duration after narration edit
     if (updates.narration !== undefined) {
-      scene.estimatedDurationSec = Math.ceil(estimateNarrationDuration(scene.narration));
       script.calculateEstimatedDuration();
     }
 

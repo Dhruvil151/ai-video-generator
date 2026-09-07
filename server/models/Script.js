@@ -1,175 +1,92 @@
 import { SCENE_TYPES, VIDEO_CONFIG } from '../config/constants.js';
 
-// ─── SceneModel ──────────────────────────────────────────────────────────────
-export class SceneModel {
+// ─── VisualModel ──────────────────────────────────────────────────────────────
+// A single visual beat within a section. Multiple visuals share one audio track.
+export class VisualModel {
   constructor(data = {}) {
-    this.id       = data.id       || `scene_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
-    this.type     = Object.values(SCENE_TYPES).includes(data.type) ? data.type : SCENE_TYPES.CONCEPT_CARD;
-    this.title    = data.title    || 'Untitled Scene';
-    this.subtitle = data.subtitle || '';
-    this.narration = data.narration || '';
+    this.id             = data.id   || `visual_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+    this.type           = Object.values(SCENE_TYPES).includes(data.type) ? data.type : SCENE_TYPES.CONCEPT_CARD;
+    this.title          = data.title    || '';
+    this.subtitle       = data.subtitle || '';
+    this.durationFraction = Math.max(0.05, data.durationFraction || 0.5);
 
-    // Timing — set after TTS synthesis
-    this.estimatedDurationSec = data.estimatedDurationSec || null;
-    this.actualDurationSec    = data.actualDurationSec    || null;
+    // Timing — set by SectionModel.populateVisualTimings()
+    this.startSec       = data.startSec    || 0;
+    this.durationSec    = data.durationSec || 0;
 
-    // Audio — set after TTS synthesis
-    this.audioFile    = data.audioFile    || null;
-    this.audioUrl     = data.audioUrl     || null;
-    this.audioCacheKey = data.audioCacheKey || null;
-    this.subtitles    = data.subtitles    || []; // [{ text, start (sec), end (sec) }]
-
-    // Visual payload — varies by scene type
-    this.payload = {
-      // ── Layout variant — read by every component to pick visual structure ──
-      // Each scene type supports 2–3 named variants (e.g. 'split', 'fullscreen')
-      layout: data.payload?.layout || 'default',
-
-      // ── CodeEditorScene ──────────────────────────────────────────────────
-      // layout: 'split' (default) | 'fullscreen'
-      code:           data.payload?.code           || '',
-      language:       data.payload?.language       || 'javascript',
-      filename:       data.payload?.filename       || 'index.js',
-      highlightLines: data.payload?.highlightLines || [],
-      callout:        data.payload?.callout        || '',
-
-      // ── ArchitectureScene ────────────────────────────────────────────────
-      // layout: 'flow' (default) | 'radial'
-      // nodes: [{ id, label, icon, status: 'active'|'idle'|'processing'|'success' }]
-      nodes:           data.payload?.nodes           || [],
-      // connections: [{ from (nodeId), to (nodeId), label }]
-      connections:     data.payload?.connections     || [],
-      flowDescription: data.payload?.flowDescription || '',
-
-      // ── ConceptCardScene / SummaryScene ─────────────────────────────────
-      // layout: 'stack' (default) | 'grid'
-      // bulletPoints: [{ icon, title, description }]
-      bulletPoints: data.payload?.bulletPoints || [],
-      badges:       data.payload?.badges       || [],
-      keyTakeaway:  data.payload?.keyTakeaway  || '',
-
-      // ── ComparisonScene ──────────────────────────────────────────────────
-      leftTitle:   data.payload?.leftTitle   || '',
-      leftPoints:  data.payload?.leftPoints  || [],
-      rightTitle:  data.payload?.rightTitle  || '',
-      rightPoints: data.payload?.rightPoints || [],
-
-      // ── TitleScene ───────────────────────────────────────────────────────
-      // layout: 'orbital' (default) | 'minimal'
-      topicTag: data.payload?.topicTag || '',
-
-      // ── TimelineScene ────────────────────────────────────────────────────
-      // layout: 'horizontal' | 'vertical'
-      // steps: [{ label, description, icon, timestamp? }]
-      steps: data.payload?.steps || [],
-
-      // ── StatsScene ───────────────────────────────────────────────────────
-      // layout: 'counters' | 'bar'
-      // stats: [{ value, label, icon, suffix? }]
-      stats: data.payload?.stats || [],
-
-      // ── TerminalScene ────────────────────────────────────────────────────
-      // layout: 'typed' | 'split'
-      // commands: [{ prompt, input, output: string[] }]
-      commands:    data.payload?.commands    || [],
-      termTitle:   data.payload?.termTitle   || 'Terminal',
-
-      // ── QuoteScene ───────────────────────────────────────────────────────
-      // layout: 'centered' | 'left-accent'
-      quote:       data.payload?.quote       || '',
-      author:      data.payload?.author      || '',
-      context:     data.payload?.context     || '',
-
-      // ── StepsScene ───────────────────────────────────────────────────────
-      // layout: 'numbered' | 'cards'
-      // steps shared with TimelineScene — same field, different visual treatment
-    };
+    // Visual payload — normalized from Gemini output
+    this.payload = normalizePayload(data.payload || {});
   }
 
-  /**
-   * Warn (not throw) when required payload fields are missing for the scene type.
-   * Called from validate() so the pipeline always surfaces empty-slide issues.
-   */
-  warnOnEmptyPayload() {
-    const tag = `[SceneModel] ⚠️  Scene "${this.title}" (${this.id}, type: ${this.type})`;
-
-    const checks = {
-      CodeEditorScene: () => {
-        if (!this.payload.code || this.payload.code.trim() === '') {
-          console.warn(`${tag} is missing payload.code — CodeEditorScene will show "// No code provided"`);
-        }
-      },
-      ArchitectureScene: () => {
-        if (!this.payload.nodes || this.payload.nodes.length === 0) {
-          console.warn(`${tag} is missing payload.nodes — ArchitectureScene will render an empty diagram`);
-        }
-        if (!this.payload.connections || this.payload.connections.length === 0) {
-          console.warn(`${tag} is missing payload.connections — no edges will be drawn`);
-        }
-      },
-      ConceptCardScene: () => {
-        if (!this.payload.bulletPoints || this.payload.bulletPoints.length === 0) {
-          console.warn(`${tag} is missing payload.bulletPoints — ConceptCardScene will show no cards`);
-        }
-      },
-      SummaryScene: () => {
-        if (!this.payload.bulletPoints || this.payload.bulletPoints.length === 0) {
-          console.warn(`${tag} is missing payload.bulletPoints — SummaryScene will show no takeaway items`);
-        }
-      },
-      TitleScene: () => {
-        if (!this.payload.badges || this.payload.badges.length === 0) {
-          console.warn(`${tag} is missing payload.badges — TitleScene will show no tag pills`);
-        }
-      },
-      ComparisonScene: () => {
-        if (!this.payload.leftPoints || this.payload.leftPoints.length === 0) {
-          console.warn(`${tag} is missing payload.leftPoints — ComparisonScene left column will be empty`);
-        }
-        if (!this.payload.rightPoints || this.payload.rightPoints.length === 0) {
-          console.warn(`${tag} is missing payload.rightPoints — ComparisonScene right column will be empty`);
-        }
-      },
-      TimelineScene: () => {
-        if (!this.payload.steps || this.payload.steps.length === 0) {
-          console.warn(`${tag} is missing payload.steps — TimelineScene will render empty`);
-        }
-      },
-      StatsScene: () => {
-        if (!this.payload.stats || this.payload.stats.length === 0) {
-          console.warn(`${tag} is missing payload.stats — StatsScene will render empty`);
-        }
-      },
-      TerminalScene: () => {
-        if (!this.payload.commands || this.payload.commands.length === 0) {
-          console.warn(`${tag} is missing payload.commands — TerminalScene will render empty`);
-        }
-      },
-      QuoteScene: () => {
-        if (!this.payload.quote || this.payload.quote.trim() === '') {
-          console.warn(`${tag} is missing payload.quote — QuoteScene will render empty`);
-        }
-      },
-      StepsScene: () => {
-        if (!this.payload.steps || this.payload.steps.length === 0) {
-          console.warn(`${tag} is missing payload.steps — StepsScene will render empty`);
-        }
-      },
+  /** Convert to a scene-like object compatible with EducationalVideo.tsx */
+  toScene(sectionNarration = '', sectionSubtitles = []) {
+    return {
+      id:                  this.id,
+      type:                this.type,
+      title:               this.title,
+      subtitle:            this.subtitle,
+      narration:           sectionNarration,
+      audioUrl:            null,   // Remotion renders muted; FFmpeg handles audio
+      actualDurationSec:   this.durationSec,
+      estimatedDurationSec: this.durationSec,
+      subtitles:           sectionSubtitles,
+      payload:             this.payload,
     };
-
-    const checker = checks[this.type];
-    if (checker) checker();
-  }
-
-  validate() {
-    if (!this.narration || this.narration.trim() === '') {
-      throw new Error(`Scene "${this.title}" (${this.id}) is missing narration text.`);
-    }
-    this.warnOnEmptyPayload();
-    return true;
   }
 }
 
+// ─── SectionModel ─────────────────────────────────────────────────────────────
+// One continuous narration driving 1-3 visual cuts.
+export class SectionModel {
+  constructor(data = {}) {
+    this.id       = data.id       || `section_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+    this.narration = data.narration || '';
+    this.visuals  = (data.visuals || []).map((v, i) =>
+      new VisualModel({ ...v, id: `${this.id}_v${i}` })
+    );
+
+    // Set after TTS synthesis
+    this.audioPath           = data.audioPath  || null;
+    this.audioUrl            = data.audioUrl   || null;
+    this.actualDurationSec   = data.actualDurationSec || 0;
+    this.estimatedDurationSec = data.estimatedDurationSec || 0;
+    this.subtitles           = data.subtitles || [];
+  }
+
+  /** Normalize durationFraction values so they sum to 1.0 */
+  normalizeFractions() {
+    const total = this.visuals.reduce((s, v) => s + v.durationFraction, 0);
+    if (total > 0) this.visuals.forEach(v => { v.durationFraction = v.durationFraction / total; });
+  }
+
+  /**
+   * Compute startSec and durationSec for each visual from actualDurationSec.
+   * Must be called after TTS sets actualDurationSec.
+   */
+  populateVisualTimings() {
+    this.normalizeFractions();
+    let elapsed = 0;
+    for (const v of this.visuals) {
+      v.startSec   = elapsed;
+      v.durationSec = Math.max(3, this.actualDurationSec * v.durationFraction);
+      elapsed += v.durationSec;
+    }
+  }
+
+  /** Validate and fill missing visual payloads from narration */
+  validate() {
+    if (!this.narration?.trim()) throw new Error(`Section "${this.id}" is missing narration`);
+    if (this.visuals.length === 0) throw new Error(`Section "${this.id}" has no visuals`);
+    for (const v of this.visuals) {
+      fillVisualPayload(v, this.narration);
+    }
+  }
+
+  /** Return visuals as renderable scene objects for Remotion */
+  toRenderableScenes() {
+    return this.visuals.map(v => v.toScene(this.narration, this.subtitles));
+  }
+}
 
 // ─── ScriptModel ─────────────────────────────────────────────────────────────
 export class ScriptModel {
@@ -177,71 +94,182 @@ export class ScriptModel {
     this.id     = data.id     || `script_${Date.now()}`;
     this.topic  = data.topic  || '';
     this.mode   = data.mode === 'detailed' ? 'detailed' : 'short';
-    this.targetDurationMinutes   = data.targetDurationMinutes   || (this.mode === 'detailed' ? 8 : 2);
+    this.targetDurationMinutes   = data.targetDurationMinutes || (this.mode === 'detailed' ? 8 : 3);
     this.estimatedTotalDurationSec = data.estimatedTotalDurationSec || 0;
     this.actualTotalDurationSec    = data.actualTotalDurationSec    || 0;
-    this.voice  = data.voice  || 'en-US-ChristopherNeural';
-    this.scenes = (data.scenes || []).map(s => new SceneModel(s));
+    this.voice    = data.voice    || 'en-US-GuyNeural';
+    this.sections = (data.sections || []).map(s => new SectionModel(s));
     this.createdAt = data.createdAt || new Date().toISOString();
     this.updatedAt = new Date().toISOString();
   }
 
-  /**
-   * Estimate scene durations from narration word counts + SSML breaks.
-   * Runs before TTS synthesis as a fast pre-render estimate.
-   */
+  /** Backward-compat: flat list of all visuals across sections (for log lines, API, etc.) */
+  get scenes() {
+    return this.sections.flatMap(s => s.visuals);
+  }
+
+  /** Estimate section durations from narration word counts + SSML breaks. */
   calculateEstimatedDuration() {
     const wpm = VIDEO_CONFIG.WORDS_PER_MINUTE;
-    const pad = VIDEO_CONFIG.SCENE_TRANSITION_PADDING_SEC;
     let total = 0;
-
-    for (const scene of this.scenes) {
-      const cleanText = (scene.narration || '')
-        .replace(/<[^>]+>/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-      const words = cleanText.split(/\s+/).filter(Boolean).length;
+    for (const section of this.sections) {
+      const clean = (section.narration || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      const words = clean.split(/\s+/).filter(Boolean).length;
       const speechSec = (words / wpm) * 60;
 
-      // Parse SSML break durations
       let breakSec = 0;
       const breakRe = /<break\s+time=["'](\d+(?:\.\d+)?)(s|ms)?["']\s*\/>/gi;
       let m;
-      while ((m = breakRe.exec(scene.narration)) !== null) {
+      while ((m = breakRe.exec(section.narration)) !== null) {
         const val = parseFloat(m[1]);
         const unit = (m[2] || 's').toLowerCase();
         breakSec += unit === 'ms' ? val / 1000 : val;
       }
 
-      const duration = Math.max(4, speechSec + breakSec + pad);
-      scene.estimatedDurationSec = Math.ceil(duration * 10) / 10;
-      total += scene.estimatedDurationSec;
+      section.estimatedDurationSec = Math.max(5, speechSec + breakSec);
+      total += section.estimatedDurationSec;
     }
-
     this.estimatedTotalDurationSec = Math.ceil(total * 10) / 10;
     return this.estimatedTotalDurationSec;
   }
 
-  /** Recalculate total from actual TTS-derived durations after synthesis. */
   recalculateActualDuration() {
-    this.actualTotalDurationSec = this.scenes.reduce(
+    this.actualTotalDurationSec = this.sections.reduce(
       (sum, s) => sum + (s.actualDurationSec || s.estimatedDurationSec || 0), 0
     );
     return this.actualTotalDurationSec;
   }
 
   toJSON() {
+    // Expose both sections (new) and a flat scenes array (backward compat)
+    const flatScenes = this.sections.flatMap(s =>
+      s.visuals.map(v => ({
+        id: v.id, type: v.type, title: v.title, subtitle: v.subtitle,
+        narration: s.narration, actualDurationSec: v.durationSec,
+        estimatedDurationSec: v.durationSec, payload: v.payload,
+      }))
+    );
     return {
-      id: this.id,
-      topic: this.topic,
-      mode: this.mode,
-      targetDurationMinutes: this.targetDurationMinutes,
+      id:                        this.id,
+      topic:                     this.topic,
+      mode:                      this.mode,
+      targetDurationMinutes:     this.targetDurationMinutes,
       estimatedTotalDurationSec: this.estimatedTotalDurationSec,
-      actualTotalDurationSec: this.actualTotalDurationSec,
-      voice: this.voice,
-      scenes: this.scenes,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
+      actualTotalDurationSec:    this.actualTotalDurationSec,
+      voice:                     this.voice,
+      sections:                  this.sections,
+      scenes:                    flatScenes,
+      createdAt:                 this.createdAt,
+      updatedAt:                 this.updatedAt,
     };
   }
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function normalizePayload(raw = {}) {
+  return {
+    layout:          raw.layout          || 'default',
+    code:            raw.code            || '',
+    language:        raw.language        || 'javascript',
+    filename:        raw.filename        || 'index.js',
+    highlightLines:  raw.highlightLines  || [],
+    callout:         raw.callout         || '',
+    nodes:           raw.nodes           || [],
+    connections:     raw.connections     || [],
+    flowDescription: raw.flowDescription || '',
+    bulletPoints:    raw.bulletPoints    || [],
+    badges:          raw.badges          || [],
+    keyTakeaway:     raw.keyTakeaway     || '',
+    leftTitle:       raw.leftTitle       || '',
+    leftPoints:      raw.leftPoints      || [],
+    rightTitle:      raw.rightTitle      || '',
+    rightPoints:     raw.rightPoints     || [],
+    topicTag:        raw.topicTag        || '',
+    steps:           raw.steps           || [],
+    stats:           raw.stats           || [],
+    commands:        (raw.commands || []).map(c => ({
+      ...c,
+      output: Array.isArray(c.output) ? c.output : c.output ? [String(c.output)] : [],
+    })),
+    termTitle:       raw.termTitle       || 'Terminal',
+    quote:           raw.quote           || '',
+    author:          raw.author          || '',
+    context:         raw.context         || '',
+    diffLines:       raw.diffLines       || [],
+    headers:         raw.headers         || [],
+    rows:            raw.rows            || [],
+    xLabels:         raw.xLabels         || [],
+    series:          raw.series          || [],
+    yUnit:           raw.yUnit           || '',
+    rootName:        raw.rootName        || '',
+    tree:            raw.tree            || [],
+    chapterNumber:   raw.chapterNumber   || '',
+    chapterTitle:    raw.chapterTitle    || '',
+    description:     raw.description     || '',
+    actors:          raw.actors          || [],
+    messages:        raw.messages        || [],
+  };
+}
+
+function fillVisualPayload(visual, narration) {
+  const clean = (narration || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  const sentences = clean.split(/(?<=[.!?])\s+/).filter(s => s.length > 10);
+
+  const isEmpty = {
+    CodeEditorScene:      () => !visual.payload.code?.trim(),
+    ArchitectureScene:    () => !visual.payload.nodes?.length,
+    ConceptCardScene:     () => !visual.payload.bulletPoints?.length,
+    SummaryScene:         () => !visual.payload.bulletPoints?.length,
+    ComparisonScene:      () => !visual.payload.leftPoints?.length && !visual.payload.rightPoints?.length,
+    TimelineScene:        () => !visual.payload.steps?.length,
+    StatsScene:           () => !visual.payload.stats?.length,
+    TerminalScene:        () => !visual.payload.commands?.length,
+    QuoteScene:           () => !visual.payload.quote?.trim(),
+    StepsScene:           () => !visual.payload.steps?.length,
+    CodeDiffScene:        () => !visual.payload.diffLines?.length,
+    ComparisonTableScene: () => !visual.payload.headers?.length || !visual.payload.rows?.length,
+    LineChartScene:       () => !visual.payload.series?.length,
+    FileTreeScene:        () => !visual.payload.tree?.length,
+    ChapterScene:         () => !visual.payload.chapterTitle?.trim(),
+    SequenceDiagramScene: () => !visual.payload.actors?.length,
+  };
+
+  const check = isEmpty[visual.type];
+  if (!check || !check()) return;
+
+  console.warn(`[VisualModel] Filling empty payload for "${visual.title}" (${visual.type})`);
+
+  if (visual.type === 'QuoteScene') {
+    visual.payload.quote = sentences[0] || clean.slice(0, 200);
+    return;
+  }
+
+  // Fallback to ConceptCardScene
+  visual.type = SCENE_TYPES.CONCEPT_CARD;
+  visual.payload.layout = 'stack';
+  visual.payload.bulletPoints = sentences.slice(0, 3).map((s, i) => ({
+    icon: ['zap', 'shield', 'globe'][i % 3],
+    title: s.length > 60 ? s.slice(0, 57) + '...' : s,
+    description: '',
+  }));
+}
+
+// Keep SceneModel export for any remaining direct usages
+export class SceneModel {
+  constructor(data = {}) {
+    this.id        = data.id        || `scene_${Date.now()}`;
+    this.type      = Object.values(SCENE_TYPES).includes(data.type) ? data.type : SCENE_TYPES.CONCEPT_CARD;
+    this.title     = data.title     || '';
+    this.subtitle  = data.subtitle  || '';
+    this.narration = data.narration || '';
+    this.estimatedDurationSec = data.estimatedDurationSec || null;
+    this.actualDurationSec    = data.actualDurationSec    || null;
+    this.audioFile  = data.audioFile  || null;
+    this.audioUrl   = data.audioUrl   || null;
+    this.subtitles  = data.subtitles  || [];
+    this.payload    = normalizePayload(data.payload);
+  }
+  fillEmptyPayload() { fillVisualPayload(this, this.narration); }
+  validate() { return true; }
 }

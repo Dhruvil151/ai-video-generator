@@ -23,8 +23,8 @@ export const SubtitlesOverlay: React.FC<SubtitlesOverlayProps> = ({
   // If no subtitles from Edge-TTS, return nothing
   if (!subtitles || subtitles.length === 0) return null;
 
-  // Find the active window of words to display (max ~12 words around current position)
-  const WINDOW = 12;
+  // Find the active window of words to display (max ~9 words around current position)
+  const WINDOW = 9;
   const activeIdx = subtitles.findIndex((w: WordTimestamp) => currentSec >= w.start && currentSec <= w.end);
 
   // Manual findLastIndex (ES2019 compat — no ES2023 needed)

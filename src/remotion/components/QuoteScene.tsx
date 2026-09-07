@@ -4,7 +4,7 @@ import React from 'react';
 import { BackgroundGradients } from './BackgroundGradients';
 import '../styles/video.css';
 
-export const QuoteScene = ({ scene, bgMusicUrl }: any) => {
+export const QuoteScene = ({ scene, bgMusicUrl, techPrimary, techSecondary }: any) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const durationSec = scene.actualDurationSec || scene.estimatedDurationSec || 10;
@@ -16,16 +16,16 @@ export const QuoteScene = ({ scene, bgMusicUrl }: any) => {
 
   return (
     <AbsoluteFill className="scene">
-      <BackgroundGradients variant="concept" />
+      <BackgroundGradients variant="concept" techPrimary={techPrimary} techSecondary={techSecondary} />
       {layout === 'centered'
-        ? <CenteredQuote  quote={quote} author={author} context={context} title={scene.title} frame={frame} fps={fps} />
+        ? <CenteredQuote  quote={quote} author={author} context={context} title={scene.title} frame={frame} fps={fps} totalFrames={totalFrames} />
         : <LeftAccentQuote quote={quote} author={author} context={context} title={scene.title} frame={frame} fps={fps} />}
       <div className="progress-bar" style={{ width:`${interpolate(frame,[0,totalFrames],[0,100])}%` }} />
     </AbsoluteFill>
   );
 };
 
-const CenteredQuote = ({ quote, author, context, title, frame, fps }: any) => {
+const CenteredQuote = ({ quote, author, context, title, frame, fps, totalFrames }: any) => {
   const tagSpring    = spring({ frame, fps, config:{ damping:24, stiffness:120 }, delay:0  });
   const quoteSpring  = spring({ frame, fps, config:{ damping:20, stiffness:90  }, delay:12 });
   const authorSpring = spring({ frame, fps, config:{ damping:20, stiffness:100 }, delay:30 });
@@ -45,8 +45,21 @@ const CenteredQuote = ({ quote, author, context, title, frame, fps }: any) => {
         "
       </div>
       <div style={{ opacity:quoteSpring, transform:`scale(${interpolate(quoteSpring,[0,1],[0.92,1])})` }}>
-        <p style={{ fontSize:'40px', fontWeight:700, lineHeight:1.5, color:'#E6EDF3', fontFamily:'Outfit,sans-serif', maxWidth:'1100px', margin:'0 0 48px' }}>
-          "{quote}"
+        <p style={{ fontSize:'40px', fontWeight:700, lineHeight:1.5, fontFamily:'Outfit,sans-serif', maxWidth:'1100px', margin:'0 0 48px' }}>
+          <span style={{ color:'#8B949E' }}>"</span>
+          {words.map((word: string, wi: number) => {
+            const baseDelay      = Math.floor(totalFrames * 0.05);
+            const perWordDelay   = Math.floor(totalFrames * 0.03);
+            const revealDuration = Math.max(4, Math.floor(totalFrames * 0.03));
+            const wordDelay      = baseDelay + wi * perWordDelay;
+            const wordOpacity    = interpolate(frame, [wordDelay, wordDelay + revealDuration], [0, 1], { extrapolateLeft:'clamp', extrapolateRight:'clamp' });
+            return (
+              <span key={wi} style={{ color:'#E6EDF3', opacity: wordOpacity, display:'inline' }}>
+                {wi > 0 ? ' ' : ''}{word}
+              </span>
+            );
+          })}
+          <span style={{ color:'#8B949E' }}>"</span>
         </p>
       </div>
       <div style={{ opacity:authorSpring, transform:`translateY(${interpolate(authorSpring,[0,1],[20,0])}px)` }}>

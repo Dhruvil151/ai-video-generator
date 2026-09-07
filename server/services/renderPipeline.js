@@ -23,6 +23,7 @@
 import fs from 'fs';
 import path from 'path';
 import { ENV } from '../config/env.js';
+import { ScriptModel } from '../models/Script.js';
 import { TTSService } from './ttsService.js';
 import { bundleComposition, renderScene, computeSceneTimings } from './remotionRenderService.js';
 import { stitchScenesWithAudio, mixBackgroundMusic, applyFades } from './ffmpegService.js';
@@ -51,61 +52,67 @@ async function reportProgress(bullJob, model, status, percent, message) {
  * @param {object} script     - Generated script from Phase 3 (scenes array)
  * @param {object} options    - { voice, bgMusicUrl }
  */
-export async function runRenderPipeline(bullJob, model, script, options = {}) {
-  const { voice = 'en-US-ChristopherNeural', bgMusicUrl = null } = options;
+export async function runRenderPipeline(bullJob, model, rawScript, options = {}) {
+  const { voice = 'en-US-GuyNeural', bgMusicUrl = null } = options;
   const jobId   = bullJob.id;
   const tempDir = getJobTempDir(jobId);
+
+  // Rehydrate plain JSON object into ScriptModel so SectionModel/VisualModel methods are available.
+  // BullMQ serializes job.data to Redis as JSON, stripping class prototypes.
+  const script = rawScript instanceof ScriptModel ? rawScript : new ScriptModel(rawScript);
 
   console.log(`\n${'─'.repeat(60)}`);
   console.log(`[Pipeline] Job ${jobId} — "${script.topic}" [${script.mode}]`);
   console.log(`${'─'.repeat(60)}`);
 
   try {
-    // ── Phase A: TTS synthesis ─────────────────────────────────────────────────
+    // ── Phase A: TTS synthesis — one audio per section ─────────────────────────
     await reportProgress(bullJob, model, JOB_STATUS.GENERATING_AUDIO, 2, 'Synthesizing voiceover audio…');
 
-    const scenes = [...script.scenes];
-    const BATCH_SIZE = 3; // synthesize max 3 at a time to avoid rate limits
+    const sections = script.sections;
+    const BATCH_SIZE = 3;
 
-    for (let i = 0; i < scenes.length; i += BATCH_SIZE) {
-      const batch = scenes.slice(i, i + BATCH_SIZE);
+    for (let i = 0; i < sections.length; i += BATCH_SIZE) {
+      const batch = sections.slice(i, i + BATCH_SIZE);
 
-      const results = await Promise.all(batch.map(async scene => {
-        // Strip SSML tags for cache key but pass raw narration to TTS (edge-tts handles SSML)
-        // Prefix sceneId with jobId so audio files never collide across concurrent/sequential jobs
-        const jobScopedId = `job${jobId}_${scene.id}`;
+      await Promise.all(batch.map(async section => {
+        const jobScopedId = `job${jobId}_${section.id}`;
         const { audioFile, audioPath, durationSec, subtitles } = await TTSService.synthesize(
-          scene.narration,
+          section.narration,
           voice,
           jobScopedId,
         );
 
-        scene.audioPath         = audioPath;
-        // Provide absolute URL so Remotion's internal browser fetches it from our Express API
-        // Use audioFile (the job-scoped filename) not path.basename(audioPath) which returns the cache hash on hits
-        scene.audioUrl          = `http://localhost:${ENV.PORT}/public/audio/${audioFile}`;
-        scene.subtitles         = subtitles || [];
+        section.audioPath         = audioPath;
+        section.audioUrl          = `http://localhost:${ENV.PORT}/public/audio/${audioFile}`;
+        section.subtitles         = subtitles || [];
+        section.actualDurationSec = durationSec || section.estimatedDurationSec;
 
-        scene.actualDurationSec = durationSec || scene.estimatedDurationSec;
-        return scene;
+        // Distribute audio duration across this section's visuals
+        section.populateVisualTimings();
       }));
 
-      const batchEnd = Math.min(i + BATCH_SIZE, scenes.length);
-      const pct = Math.round(2 + (batchEnd / scenes.length) * 13);
+      const batchEnd = Math.min(i + BATCH_SIZE, sections.length);
+      const pct = Math.round(2 + (batchEnd / sections.length) * 13);
       await reportProgress(bullJob, model, JOB_STATUS.GENERATING_AUDIO, pct,
-        `TTS ${batchEnd}/${scenes.length} scenes complete`);
+        `TTS ${batchEnd}/${sections.length} sections complete`);
     }
+
+    // Flatten sections → renderable scene objects for Remotion
+    // Each visual becomes one scene-like object; Remotion still renders muted
+    const renderableScenes = sections.flatMap(s => s.toRenderableScenes());
+    console.log(`[Pipeline] ${sections.length} sections → ${renderableScenes.length} visuals to render`);
 
     // ── Phase B: Bundle ────────────────────────────────────────────────────────
     await reportProgress(bullJob, model, JOB_STATUS.BUNDLING, 15, 'Bundling Remotion composition…');
     const bundleDir = await bundleComposition();
     await reportProgress(bullJob, model, JOB_STATUS.BUNDLING, 20, 'Bundle complete');
 
-    // ── Phase C: Render scenes sequentially ────────────────────────────────────
+    // ── Phase C: Render visuals sequentially ───────────────────────────────────
     await reportProgress(bullJob, model, JOB_STATUS.RENDERING_SCENES, 20, 'Starting scene renders…');
 
-    const timings     = computeSceneTimings(scenes);
-    const scenePaths  = [];
+    const timings    = computeSceneTimings(renderableScenes);
+    const scenePaths = [];
 
     for (let i = 0; i < timings.length; i++) {
       const { scene, fromFrame, durationFrames } = timings[i];
@@ -113,36 +120,43 @@ export async function runRenderPipeline(bullJob, model, script, options = {}) {
 
       await reportProgress(bullJob, model, JOB_STATUS.RENDERING_SCENES,
         20 + Math.round((i / timings.length) * 50),
-        `Rendering scene ${i + 1}/${timings.length}: ${scene.title}`);
+        `Rendering visual ${i + 1}/${timings.length}: ${scene.title}`);
 
       await renderScene({
         bundleDir,
         fromFrame,
         durationFrames,
-        // Strip audioUrl from scenes passed to Remotion — we render muted:true and
-        // FFmpeg handles audio in Phase D. This prevents Remotion's headless browser
-        // from trying to download audio assets and getting 404s.
-        scenes: scenes.map(s => ({ ...s, audioUrl: null })),
-        bgMusicUrl: null, // no bg music during render — FFmpeg handles it
+        scenes: renderableScenes.map(s => ({ ...s, audioUrl: null })),
+        bgMusicUrl: null,
+        topic: script.topic || '',
         outputPath: sceneFile,
       });
 
       if (model) model.onSceneComplete(i);
       scenePaths.push(sceneFile);
-      console.log(`[Pipeline] ✓ Scene ${i + 1}/${scenes.length} rendered → ${path.basename(sceneFile)}`);
+      console.log(`[Pipeline] ✓ Visual ${i + 1}/${renderableScenes.length} rendered → ${path.basename(sceneFile)}`);
     }
 
-    // ── Phase D: Stitch ───────────────────────────────────────────────────────────
+    // ── Phase D: Stitch — audio trimmed to each visual's window ───────────────
     await reportProgress(bullJob, model, JOB_STATUS.STITCHING, 70, 'Concatenating scene videos with audio…');
 
-    // Build scene descriptor array: { videoPath, audioPath, durationSec } per scene
-    const sceneDescriptors = timings.map(({ scene }, i) => ({
-      videoPath:   scenePaths[i],
-      audioPath:   scene.audioPath,
-      durationSec: scene.actualDurationSec || scene.estimatedDurationSec || 10,
-    }));
+    // Each visual descriptor includes audioStartSec: where in the section audio it starts.
+    // FFmpeg atrim uses start:end offsets so visuals 2+ get the correct portion of the audio.
+    const sceneDescriptors = [];
+    let visualIdx = 0;
+    for (const section of sections) {
+      for (const visual of section.visuals) {
+        sceneDescriptors.push({
+          videoPath:     scenePaths[visualIdx],
+          audioPath:     section.audioPath,
+          audioStartSec: visual.startSec,
+          durationSec:   visual.durationSec,
+        });
+        visualIdx++;
+      }
+    }
 
-    const concatPath = path.join(tempDir, 'raw_concat.mp4');
+    const concatPath = path.join(tempDir, 'raw_concat.lossless.mp4');
     await stitchScenesWithAudio(sceneDescriptors, concatPath);
 
     // Determine final output filename

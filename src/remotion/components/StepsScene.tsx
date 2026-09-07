@@ -2,12 +2,11 @@
 import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate, spring } from 'remotion';
 import React from 'react';
 import { BackgroundGradients } from './BackgroundGradients';
+import { SvgIcon } from './SvgIcons';
 import '../styles/video.css';
-
-const ICON_MAP = { 'zap':'⚡','shield':'🛡️','layers':'📚','globe':'🌐','cpu':'⚙️','database':'🗄️','server':'🖥️','cloud':'☁️','code':'<>','lock':'🔒','check-circle':'✅','activity':'📈','bar-chart':'📊','settings':'⚙️','refresh-cw':'🔄','key':'🔑','package':'📦','git-branch':'🌿','network':'🔗','terminal':'⬛','arrow-right':'→','alert-triangle':'⚠️','clock':'⏱️','box':'📦','play':'▶','file':'📄','link':'🔗','repeat':'🔁','stop-circle':'⏹' };
 const ACCENTS = ['#00D9FF','#8B5CF6','#10B981','#F59E0B','#EC4899'];
 
-export const StepsScene = ({ scene, bgMusicUrl }: any) => {
+export const StepsScene = ({ scene, bgMusicUrl, techPrimary, techSecondary }: any) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const durationSec = scene.actualDurationSec || scene.estimatedDurationSec || 10;
@@ -18,24 +17,26 @@ export const StepsScene = ({ scene, bgMusicUrl }: any) => {
 
   return (
     <AbsoluteFill className="scene">
-      <BackgroundGradients variant="concept" />
+      <BackgroundGradients variant="concept" techPrimary={techPrimary} techSecondary={techSecondary} />
       <div style={{ padding:'48px 80px 0', opacity:headerSpring, transform:`translateY(${interpolate(headerSpring,[0,1],[-30,0])}px)` }}>
         <div className="scene-tag">Steps</div>
         <h2 className="scene-title">{scene.title}</h2>
         {scene.subtitle && <p className="scene-subtitle">{scene.subtitle}</p>}
       </div>
       {layout === 'cards'
-        ? <CardsLayout  steps={steps} frame={frame} fps={fps} />
-        : <NumberedLayout steps={steps} frame={frame} fps={fps} />}
+        ? <CardsLayout    steps={steps} frame={frame} fps={fps} totalFrames={totalFrames} />
+        : <NumberedLayout steps={steps} frame={frame} fps={fps} totalFrames={totalFrames} />}
       <div className="progress-bar" style={{ width:`${interpolate(frame,[0,totalFrames],[0,100])}%` }} />
     </AbsoluteFill>
   );
 };
 
-const NumberedLayout = ({ steps, frame, fps }: any) => (
+const NumberedLayout = ({ steps, frame, fps, totalFrames }: any) => (
   <div style={{ flex:1, display:'flex', flexDirection:'column', justifyContent:'center', padding:'20px 100px 60px', gap:'0' }}>
     {steps.slice(0,6).map((step,i) => {
-      const sp = spring({ frame, fps, config:{ damping:20, stiffness:90 }, delay:16+i*13 });
+      const baseDelay = Math.floor(totalFrames * 0.05);
+      const perItem   = Math.floor(totalFrames * 0.08);
+      const sp = spring({ frame, fps, config:{ damping:20, stiffness:90 }, delay: baseDelay + i * perItem });
       const accent = ACCENTS[i % ACCENTS.length];
       return (
         <div key={i} style={{ display:'flex', alignItems:'flex-start', gap:'32px', padding:'20px 0', borderBottom: i < steps.length-1 ? '1px solid rgba(255,255,255,0.05)' : 'none', opacity:sp, transform:`translateX(${interpolate(sp,[0,1],[-50,0])}px)` }}>
@@ -45,7 +46,7 @@ const NumberedLayout = ({ steps, frame, fps }: any) => (
           </div>
           {/* Icon */}
           <div style={{ width:'52px', height:'52px', borderRadius:'12px', background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.08)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'24px', flexShrink:0 }}>
-            {ICON_MAP[step.icon||'arrow-right']||'→'}
+            <SvgIcon name={step.icon || 'arrow-right'} size={24} color={accent} />
           </div>
           {/* Content */}
           <div style={{ flex:1, paddingTop:'4px' }}>
@@ -58,10 +59,12 @@ const NumberedLayout = ({ steps, frame, fps }: any) => (
   </div>
 );
 
-const CardsLayout = ({ steps, frame, fps }: any) => (
+const CardsLayout = ({ steps, frame, fps, totalFrames }: any) => (
   <div style={{ flex:1, display:'flex', alignItems:'center', padding:'20px 60px 60px', gap:'24px', flexWrap:'wrap', justifyContent:'center' }}>
     {steps.slice(0,6).map((step,i) => {
-      const sp = spring({ frame, fps, config:{ damping:18, stiffness:80 }, delay:16+i*16 });
+      const baseDelay = Math.floor(totalFrames * 0.05);
+      const perItem   = Math.floor(totalFrames * 0.08);
+      const sp = spring({ frame, fps, config:{ damping:18, stiffness:80 }, delay: baseDelay + i * perItem });
       const accent = ACCENTS[i % ACCENTS.length];
       return (
         <div key={i} style={{ width:'340px', padding:'36px 32px', background:'rgba(255,255,255,0.03)', border:`1px solid ${accent}25`, borderRadius:'16px', backdropFilter:'blur(12px)', boxShadow:`0 8px 32px rgba(0,0,0,0.4)`, opacity:sp, transform:`translateY(${interpolate(sp,[0,1],[60,0])}px)`, position:'relative', overflow:'hidden' }}>
@@ -69,7 +72,7 @@ const CardsLayout = ({ steps, frame, fps }: any) => (
           <div style={{ position:'absolute', top:0, left:0, right:0, height:'3px', background:`linear-gradient(90deg,${accent},transparent)` }} />
           <div style={{ display:'flex', alignItems:'center', gap:'16px', marginBottom:'18px' }}>
             <div style={{ width:'48px', height:'48px', borderRadius:'50%', background:`${accent}18`, border:`2px solid ${accent}`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'22px' }}>
-              {ICON_MAP[step.icon||'arrow-right']||'→'}
+              <SvgIcon name={step.icon || 'arrow-right'} size={24} color={accent} />
             </div>
             <span style={{ fontSize:'32px', fontWeight:900, color:accent, fontFamily:'Outfit,sans-serif' }}>0{i+1}</span>
           </div>

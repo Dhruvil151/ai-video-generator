@@ -1,7 +1,7 @@
-﻿import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate, spring } from 'remotion';
+import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate, spring } from 'remotion';
 import React from 'react';
 import { BackgroundGradients } from './BackgroundGradients';
-// SubtitlesOverlay removed â€” word-level sync unavailable from edge-tts 7.x (no WordBoundary events)
+import { SvgIcon, Check, Rocket } from './SvgIcons';
 import '../styles/video.css';
 
 interface SummarySceneProps {
@@ -19,9 +19,11 @@ interface SummarySceneProps {
     };
   };
   bgMusicUrl?: string | null;
+  techPrimary?: string;
+  techSecondary?: string;
 }
 
-export const SummaryScene: React.FC<SummarySceneProps> = ({ scene, bgMusicUrl }) => {
+export const SummaryScene: React.FC<SummarySceneProps> = ({ scene, bgMusicUrl, techPrimary, techSecondary }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const durationSec = scene.actualDurationSec || scene.estimatedDurationSec || 10;
@@ -39,12 +41,9 @@ export const SummaryScene: React.FC<SummarySceneProps> = ({ scene, bgMusicUrl })
   const headerSpring  = spring({ frame, fps, config: { damping: 24, stiffness: 120 }, delay: 0 });
   const takeawaySpring = spring({ frame, fps, config: { damping: 16, stiffness: 60 }, delay: 35 + points.length * 7 });
 
-  // Celebration particles
-  const confettiOpacity = interpolate(frame, [fps * (durationSec - 1), fps * durationSec], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
-
   return (
     <AbsoluteFill className="scene">
-      <BackgroundGradients variant="summary" />
+      <BackgroundGradients variant="summary" techPrimary={techPrimary} techSecondary={techSecondary} />
 
       {/* Header */}
       <div style={{
@@ -90,7 +89,7 @@ export const SummaryScene: React.FC<SummarySceneProps> = ({ scene, bgMusicUrl })
                 opacity: checkProgress,
                 transform: `scale(${interpolate(checkProgress, [0, 1], [0.5, 1])})`,
               }}>
-                âœ“
+                <Check size={28} color="#10B981" />
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{
@@ -130,7 +129,7 @@ export const SummaryScene: React.FC<SummarySceneProps> = ({ scene, bgMusicUrl })
             maskComposite: 'exclude',
             pointerEvents: 'none',
           }} />
-          <div style={{ fontSize: '36px', marginBottom: '12px' }}>ðŸš€</div>
+          <div style={{ marginBottom: '12px' }}><Rocket size={36} color="#00D9FF" /></div>
           <div style={{
             fontFamily: "'Outfit', sans-serif", fontSize: '34px', fontWeight: 700,
             background: 'linear-gradient(135deg, #00D9FF, #8B5CF6)',

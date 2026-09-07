@@ -24,7 +24,7 @@ export const AVAILABLE_VOICES = [
   { id: 'en-IN-NeerjaExpressiveNeural', name: 'Neerja — Indian English Female', gender: 'Female', lang: 'en-IN' },
 ];
 
-export const DEFAULT_VOICE = 'en-US-ChristopherNeural';
+export const DEFAULT_VOICE = 'en-US-GuyNeural';
 
 // ─── Scene Types ─────────────────────────────────────────────────────────────
 export const SCENE_TYPES = {
@@ -40,6 +40,13 @@ export const SCENE_TYPES = {
   TERMINAL:     'TerminalScene',   // CLI commands / shell output / npm
   QUOTE:        'QuoteScene',      // single impactful principle / law / rule
   STEPS:        'StepsScene',      // numbered how-to / setup / algorithm
+  // ── Newest scene types ─────────────────────────────────────────────────────
+  CODE_DIFF:         'CodeDiffScene',         // before/after git-diff style code
+  COMPARISON_TABLE:  'ComparisonTableScene',  // feature matrix grid across products
+  LINE_CHART:        'LineChartScene',        // animated performance/growth line chart
+  FILE_TREE:         'FileTreeScene',         // project directory structure
+  CHAPTER:           'ChapterScene',          // section/chapter title card
+  SEQUENCE_DIAGRAM:  'SequenceDiagramScene',  // actor message-flow diagram
 };
 
 // ─── BullMQ Queue ────────────────────────────────────────────────────────────
@@ -58,12 +65,12 @@ export const SCENE_CACHE_TTL_HOURS = 24;
 export const VIDEO_MODES = {
   short: {
     label: 'Short Explainer',
-    targetMinutes: 2,
+    targetMinutes: 3,
     // Gemini picks the actual count within this range based on topic complexity
-    minScenes: 4,
-    maxScenes: 8,
+    minScenes: 6,
+    maxScenes: 9,
     // Legacy fallback used by estimate() only
-    sceneCount: 5,
+    sceneCount: 7,
     description: 'Fast-paced overview covering the key concepts.',
   },
   detailed: {

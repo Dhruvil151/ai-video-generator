@@ -84,7 +84,7 @@ export async function concatenateScenes(scenePaths, outputPath) {
  * 2. Adds each scene's MP3 audio as a separate input, trimmed to its scene duration.
  * 3. Concatenates video + audio together using the FFmpeg concat filter.
  *
- * @param {Array<{videoPath: string, audioPath: string, durationSec: number}>} scenes
+ * @param {Array<{videoPath: string, audioPath: string, audioStartSec: number, durationSec: number}>} scenes
  * @param {string} outputPath - final stitched MP4 (video + TTS audio, no bg music yet)
  */
 export async function stitchScenesWithAudio(scenes, outputPath) {
@@ -112,7 +112,7 @@ export async function stitchScenesWithAudio(scenes, outputPath) {
       `pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=30,format=yuv420p,setpts=PTS-STARTPTS[v${i}]`
     );
     filterParts.push(
-      `[${audIdx}:a]aresample=48000,atrim=0:${scenes[i].durationSec.toFixed(3)},asetpts=PTS-STARTPTS[a${i}]`
+      `[${audIdx}:a]aresample=48000,atrim=${(scenes[i].audioStartSec||0).toFixed(3)}:${((scenes[i].audioStartSec||0)+scenes[i].durationSec).toFixed(3)},asetpts=PTS-STARTPTS[a${i}]`
     );
   }
 
@@ -129,16 +129,16 @@ export async function stitchScenesWithAudio(scenes, outputPath) {
     '-map', '[vout]',
     '-map', '[aout]',
     '-c:v', 'libx264',
-    '-preset', 'fast',
-    '-crf', '18',
+    '-preset', 'ultrafast',
+    '-crf', '0',
     '-c:a', 'aac',
-    '-b:a', '128k',
+    '-b:a', '192k',
     '-ar', '48000',
     '-movflags', '+faststart',
     outputPath
   );
 
-  console.log(`[FFmpeg] Stitched ${n} scenes with audio → ${path.basename(outputPath)}`);
+  console.log(`[FFmpeg] Stitched ${n} scenes with audio (lossless) → ${path.basename(outputPath)}`);
 }
 
 /**
@@ -178,10 +178,8 @@ export async function mixBackgroundMusic({
    * Uses the `sidechaincompress` filter (available in ffmpeg 4.x+).
    */
   const duckFilter = [
-    // Voice audio: pass through at full volume
-    '[0:a]aformat=sample_rates=44100:channel_layouts=stereo[voice]',
-    // Bg music: loop + normalize
-    `[1:a]aloop=loop=-1:size=2e+09,aformat=sample_rates=44100:channel_layouts=stereo,volume=${ambientVol}[bgraw]`,
+    '[0:a]aformat=sample_rates=48000:channel_layouts=stereo[voice]',
+    `[1:a]aloop=loop=-1:size=2e+09,aformat=sample_rates=48000:channel_layouts=stereo,volume=${ambientVol}[bgraw]`,
     // Sidechain: use voice as key, compress bg music
     `[bgraw][voice]sidechaincompress=threshold=0.01:ratio=20:attack=200:release=1000:level_sc=0.8[bgduck]`,
     // Mix voice + ducked bg
@@ -213,22 +211,19 @@ export async function mixBackgroundMusic({
  * @param {number} fadeSec - duration of fade in/out in seconds
  */
 export async function applyFades(inputPath, outputPath, fadeSec = 0.5) {
-  // Get duration via ffmpeg — it writes stats to STDERR (not stdout)
-  let duration = null;
-  try {
-    await execFileAsync(ffmpegPath, ['-i', inputPath, '-f', 'null', '-']);
-  } catch (err) {
-    // ffmpeg exits non-zero for -f null; capture stderr for the Duration line
-    const output = (err.stderr || '') + (err.stdout || '');
-    const match = output.match(/Duration: (\d+):(\d+):(\d+\.\d+)/);
-    if (match) {
-      duration = parseInt(match[1]) * 3600 + parseInt(match[2]) * 60 + parseFloat(match[3]);
-    }
-  }
+  const duration = await getVideoDuration(inputPath);
 
   if (!duration) {
-    console.warn('[FFmpeg] applyFades: could not determine duration — copying without fades');
-    fs.copyFileSync(inputPath, outputPath);
+    console.warn('[FFmpeg] applyFades: could not determine duration — encoding without fades (CRF 16)');
+    await ffmpeg(
+      '-y', '-i', inputPath,
+      '-r', '30',
+      '-c:v', 'libx264', '-preset', 'fast', '-crf', '16',
+      '-color_range', 'tv', '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709',
+      '-c:a', 'aac', '-b:a', '192k', '-ar', '48000',
+      '-movflags', '+faststart',
+      outputPath,
+    );
     return;
   }
 
@@ -251,14 +246,15 @@ export async function applyFades(inputPath, outputPath, fadeSec = 0.5) {
     '-r', '30',
     '-c:v', 'libx264',
     '-preset', 'fast',
-    '-crf', '18',
-    // Fix E: set color space metadata
+    '-crf', '16',
     '-color_range', 'tv',
     '-colorspace', 'bt709',
     '-color_primaries', 'bt709',
     '-color_trc', 'bt709',
     '-c:a', 'aac',
-    '-b:a', '128k',
+    '-b:a', '192k',
+    '-ar', '48000',
+    '-movflags', '+faststart',
     outputPath
   );
 
@@ -266,21 +262,21 @@ export async function applyFades(inputPath, outputPath, fadeSec = 0.5) {
 }
 
 /**
- * Get video duration in seconds using ffprobe.
+ * Get video duration in seconds.
+ * FFmpeg always writes Duration to stderr, not stdout.
  * @param {string} filePath
  * @returns {Promise<number>}
  */
 export async function getVideoDuration(filePath) {
   try {
-    const { stdout } = await execFileAsync(ffmpegPath, [
-      '-i', filePath, '-f', 'null', '-'
-    ]).catch(err => ({ stdout: '', stderr: err.stderr || '' }));
-
-    const lines = stdout + '';
-    const m = lines.match(/Duration: (\d+):(\d+):(\d+\.\d+)/);
-    if (!m) return 0;
-    return parseInt(m[1]) * 3600 + parseInt(m[2]) * 60 + parseFloat(m[3]);
-  } catch {
-    return 0;
+    await execFileAsync(ffmpegPath, ['-i', filePath, '-f', 'null', '-'], {
+      maxBuffer: 10 * 1024 * 1024,
+    });
+  } catch (err) {
+    // ffmpeg always exits non-zero for -f null — Duration is on stderr
+    const output = (err.stderr ? err.stderr.toString() : '') + (err.stdout ? err.stdout.toString() : '');
+    const m = output.match(/Duration: (\d+):(\d+):(\d+\.\d+)/);
+    if (m) return parseInt(m[1]) * 3600 + parseInt(m[2]) * 60 + parseFloat(m[3]);
   }
+  return 0;
 }

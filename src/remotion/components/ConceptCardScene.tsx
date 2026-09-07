@@ -1,7 +1,7 @@
 import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate, spring } from 'remotion';
 import React from 'react';
 import { BackgroundGradients } from './BackgroundGradients';
-// SubtitlesOverlay removed — word-level sync unavailable from edge-tts 7.x (no WordBoundary events)
+import { SvgIcon } from './SvgIcons';
 import '../styles/video.css';
 
 interface BulletPoint {
@@ -27,17 +27,9 @@ interface ConceptCardSceneProps {
     };
   };
   bgMusicUrl?: string | null;
+  techPrimary?: string;
+  techSecondary?: string;
 }
-
-const ICON_MAP: Record<string, string> = {
-  'zap': '⚡', 'shield': '🛡️', 'layers': '📚', 'globe': '🌐',
-  'cpu': '⚙️', 'database': '🗄️', 'server': '🖥️', 'cloud': '☁️',
-  'code': '< >', 'lock': '🔒', 'check-circle': '✅', 'activity': '📈',
-  'bar-chart': '📊', 'settings': '⚙️', 'refresh-cw': '🔄', 'key': '🔑',
-  'package': '📦', 'git-branch': '🌿', 'network': '🔗', 'terminal': '⬛',
-  'arrow-right': '→', 'alert-triangle': '⚠️', 'link': '🔗', 'repeat': '🔁',
-  'clock': '⏱️', 'box': '📦', 'play': '▶', 'file': '📄',
-};
 
 const ACCENT_COLORS = ['cyan', 'purple', 'green', 'amber'];
 const ACCENT_HEX = { cyan: '#00D9FF', purple: '#8B5CF6', green: '#10B981', amber: '#F59E0B' };
@@ -48,7 +40,7 @@ const ICON_BG = {
   amber:  'rgba(245,158,11,0.12)',
 };
 
-export const ConceptCardScene: React.FC<ConceptCardSceneProps> = ({ scene, bgMusicUrl }) => {
+export const ConceptCardScene: React.FC<ConceptCardSceneProps> = ({ scene, bgMusicUrl, techPrimary, techSecondary }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const durationSec = scene.actualDurationSec || scene.estimatedDurationSec || 10;
@@ -80,7 +72,7 @@ export const ConceptCardScene: React.FC<ConceptCardSceneProps> = ({ scene, bgMus
 
   return (
     <AbsoluteFill className="scene">
-      <BackgroundGradients variant="concept" />
+      <BackgroundGradients variant="concept" techPrimary={techPrimary} techSecondary={techSecondary} />
 
       {/* Header */}
       <div style={{
@@ -110,7 +102,7 @@ export const ConceptCardScene: React.FC<ConceptCardSceneProps> = ({ scene, bgMus
           opacity: takeawaySpring,
           transform: `translateY(${interpolate(takeawaySpring, [0, 1], [20, 0])}px)`,
         }}>
-          <span style={{ fontSize: '36px' }}>🎯</span>
+          <SvgIcon name="zap" size={36} color="#00D9FF" />
           <div>
             <div style={{ fontSize: '20px', color: '#00D9FF', fontFamily: 'JetBrains Mono, monospace', marginBottom: '6px', letterSpacing: '0.08em' }}>KEY TAKEAWAY</div>
             <div style={{ fontSize: '28px', color: '#E6EDF3', lineHeight: 1.4 }}>{takeaway}</div>
@@ -134,7 +126,6 @@ const StackCards: React.FC<{ points: BulletPoint[]; frame: number; fps: number }
       const accentKey = ACCENT_COLORS[i % ACCENT_COLORS.length] as keyof typeof ACCENT_HEX;
       const color  = ACCENT_HEX[accentKey];
       const iconBg = ICON_BG[accentKey];
-      const icon   = ICON_MAP[point.icon || ''] || '●';
       const cardSpring = spring({ frame, fps, config: { damping: 20, stiffness: 90 }, delay: 10 + i * 8 });
       return (
         <div key={i} style={{
@@ -148,8 +139,8 @@ const StackCards: React.FC<{ points: BulletPoint[]; frame: number; fps: number }
           borderRadius: '16px',
           backdropFilter: 'blur(12px)',
         }}>
-          <div style={{ width: '60px', height: '60px', borderRadius: '14px', flexShrink: 0, background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', border: `1px solid ${color}33` }}>
-            {icon}
+          <div style={{ width: '60px', height: '60px', borderRadius: '14px', flexShrink: 0, background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${color}33` }}>
+            <SvgIcon name={point.icon || 'zap'} size={28} color={color} />
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: '30px', fontWeight: 700, color: '#E6EDF3', marginBottom: '8px' }}>{point.title}</div>
@@ -169,7 +160,6 @@ const GridCards: React.FC<{ points: BulletPoint[]; frame: number; fps: number }>
       const accentKey = ACCENT_COLORS[i % ACCENT_COLORS.length] as keyof typeof ACCENT_HEX;
       const color  = ACCENT_HEX[accentKey];
       const iconBg = ICON_BG[accentKey];
-      const icon   = ICON_MAP[point.icon || ''] || '●';
       const cardSpring = spring({ frame, fps, config: { damping: 18, stiffness: 80 }, delay: 8 + i * 10 });
       return (
         <div key={i} style={{
@@ -184,9 +174,8 @@ const GridCards: React.FC<{ points: BulletPoint[]; frame: number; fps: number }>
           backdropFilter: 'blur(12px)',
           position: 'relative', overflow: 'hidden',
         }}>
-          {/* Subtle number watermark */}
           <div style={{ position: 'absolute', top: '12px', right: '20px', fontFamily: 'JetBrains Mono, monospace', fontSize: '64px', fontWeight: 900, color: color, opacity: 0.06 }}>0{i + 1}</div>
-          <div style={{ width: '68px', height: '68px', borderRadius: '16px', background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px', border: `1px solid ${color}33`, flexShrink: 0 }}>{icon}</div>
+          <div style={{ width: '68px', height: '68px', borderRadius: '16px', background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${color}33`, flexShrink: 0 }}><SvgIcon name={point.icon || 'zap'} size={32} color={color} /></div>
           <div>
             <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: '28px', fontWeight: 700, color: '#E6EDF3', marginBottom: '12px' }}>{point.title}</div>
             <div style={{ fontSize: '22px', color: '#8B949E', lineHeight: 1.5 }}>{point.description}</div>

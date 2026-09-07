@@ -156,15 +156,15 @@ body, #root {
 .subtitles-text {
   display: inline;
   font-family: var(--font-body);
-  font-size: 38px;
+  font-size: 30px;
   font-weight: 500;
-  line-height: 1.5;
-  padding: 12px 24px;
-  background: rgba(6, 8, 16, 0.85);
+  line-height: 1.45;
+  padding: 10px 20px;
+  background: rgba(6, 8, 16, 0.80);
   border-radius: var(--radius-md);
 }
 
-.subtitle-word { color: var(--text-secondary); transition: color 0.05s; }
+.subtitle-word { color: var(--text-secondary); }
 .subtitle-word--active { color: var(--text-primary); font-weight: 600; }
 .subtitle-word--spoken { color: var(--text-muted); }
 
@@ -175,6 +175,7 @@ body, #root {
   border-radius: var(--radius-md);
   overflow: hidden;
   font-family: var(--font-mono);
+  font-variant-ligatures: none;
 }
 
 .code-editor__titlebar {

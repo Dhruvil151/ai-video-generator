@@ -1,6 +1,7 @@
 import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate, spring } from 'remotion';
 import React from 'react';
 import { BackgroundGradients } from './BackgroundGradients';
+import { SvgIcon } from './SvgIcons';
 // SubtitlesOverlay removed — word-level sync unavailable from edge-tts 7.x (no WordBoundary events)
 import '../styles/video.css';
 
@@ -21,6 +22,8 @@ interface ComparisonSceneProps {
     };
   };
   bgMusicUrl?: string | null;
+  techPrimary?: string;
+  techSecondary?: string;
 }
 
 // Normalize: accept both string[] and {text:string}[] from Gemini
@@ -38,7 +41,7 @@ function normalizePoints(pts: Array<string | { text: string }> | undefined, fall
   return side === 'left' ? sentences.slice(0, half) : sentences.slice(half, half + 3);
 }
 
-export const ComparisonScene: React.FC<ComparisonSceneProps> = ({ scene, bgMusicUrl }) => {
+export const ComparisonScene: React.FC<ComparisonSceneProps> = ({ scene, bgMusicUrl, techPrimary, techSecondary }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const durationSec = scene.actualDurationSec || scene.estimatedDurationSec || 10;
@@ -59,7 +62,7 @@ export const ComparisonScene: React.FC<ComparisonSceneProps> = ({ scene, bgMusic
 
   return (
     <AbsoluteFill className="scene">
-      <BackgroundGradients variant="comparison" />
+      <BackgroundGradients variant="comparison" techPrimary={techPrimary} techSecondary={techSecondary} />
 
       {/* Header */}
       <div style={{
@@ -89,7 +92,7 @@ export const ComparisonScene: React.FC<ComparisonSceneProps> = ({ scene, bgMusic
             color: '#EF4444', marginBottom: '32px',
             display: 'flex', alignItems: 'center', gap: '14px',
           }}>
-            <span style={{ fontSize: '32px' }}>✗</span> {leftTitle}
+            <SvgIcon name="x-circle" size={32} color="#EF4444" /> {leftTitle}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {leftPts.slice(0, 5).map((pt, i) => {
@@ -146,7 +149,7 @@ export const ComparisonScene: React.FC<ComparisonSceneProps> = ({ scene, bgMusic
             color: '#10B981', marginBottom: '32px',
             display: 'flex', alignItems: 'center', gap: '14px',
           }}>
-            <span style={{ fontSize: '32px' }}>✓</span> {rightTitle}
+            <SvgIcon name="check-circle" size={32} color="#10B981" /> {rightTitle}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {rightPts.slice(0, 5).map((pt, i) => {

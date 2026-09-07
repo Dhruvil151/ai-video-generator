@@ -56,6 +56,7 @@ export async function renderScene({
   durationFrames,
   scenes,
   bgMusicUrl,
+  topic,
   outputPath,
   attempt = 0,
 }) {
@@ -69,7 +70,7 @@ export async function renderScene({
   const composition = await selectComposition({
     serveUrl: bundleDir,
     id: COMPOSITION_ID,
-    inputProps: { scenes, bgMusicUrl },
+    inputProps: { scenes, bgMusicUrl, topic: topic || '' },
   });
 
   // Override duration to the full video length (all scenes must be in the timeline
@@ -88,7 +89,7 @@ export async function renderScene({
       serveUrl: bundleDir,
       codec: 'h264',
       outputLocation: outputPath,
-      inputProps: { scenes, bgMusicUrl },
+      inputProps: { scenes, bgMusicUrl, topic: topic || '' },
       frameRange: [fromFrame, fromFrame + durationFrames - 1],
       concurrency,
       imageFormat: 'jpeg',

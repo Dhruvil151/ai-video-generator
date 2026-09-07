@@ -11,6 +11,9 @@ import { ensureDirectories } from '../utils/fileHelper.js';
 
 const execFileAsync = promisify(execFile);
 
+// TODO P3: Speed variation — edge-tts supports a --rate parameter (+/-% adjustment). Consider -10%
+// for complex concepts and +5% for recap/summary scenes to match Fireship's pacing rhythm
+
 /**
  * Node-side safety net: if the Python bridge returns a suspiciously short
  * duration (≤ 6.5s), measure the actual MP3 duration via ffprobe.
@@ -81,11 +84,11 @@ export class TTSService {
     const metaPath  = path.join(ENV.TTS_CACHE_DIR, `${cacheKey}_meta.json`);
     const textPath  = path.join(ENV.TEMP_DIR, `${sceneId}_text.txt`);
 
-    await fs.promises.writeFile(textPath, text, 'utf-8');
-
     let lastError = null;
 
     for (let attempt = 0; attempt <= TTS_MAX_RETRIES; attempt++) {
+      await fs.promises.writeFile(textPath, text, 'utf-8');
+      
       if (attempt > 0) {
         const delay = TTS_BASE_DELAY_MS * Math.pow(2, attempt - 1) + Math.floor(Math.random() * 500);
         console.log(`[TTS] Retry ${attempt}/${TTS_MAX_RETRIES} for "${sceneId}" — waiting ${delay}ms`);
@@ -146,19 +149,21 @@ export class TTSService {
    * @returns {Promise<ScriptModel>} Script with audio fields populated on each scene
    */
   static async synthesizeAll(script, onProgress) {
-    const total = script.scenes.length;
+    const sections = script.sections;
+    const total    = sections.length;
 
     for (let i = 0; i < total; i++) {
-      const scene = script.scenes[i];
+      const section = sections[i];
       if (onProgress) {
-        onProgress({ sceneIndex: i, total, message: `Synthesizing audio for scene ${i + 1}/${total}: "${scene.title}"` });
+        onProgress({ sceneIndex: i, total, message: `Synthesizing audio for section ${i + 1}/${total}` });
       }
 
-      const result = await this.synthesize(scene.narration, script.voice, scene.id);
-      scene.actualDurationSec = result.durationSec;
-      scene.audioFile         = result.audioFile;
-      scene.audioUrl          = result.audioUrl;
-      scene.subtitles         = result.subtitles;
+      const result = await this.synthesize(section.narration, script.voice, section.id);
+      section.actualDurationSec = result.durationSec;
+      section.audioPath         = result.audioPath;
+      section.audioUrl          = result.audioUrl;
+      section.subtitles         = result.subtitles;
+      section.populateVisualTimings();
     }
 
     script.recalculateActualDuration();

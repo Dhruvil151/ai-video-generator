@@ -50,7 +50,6 @@ async def synthesize(text: str, voice: str, audio_path: str, meta_path: str):
             if chunk['type'] == 'audio':
                 audio_file.write(chunk['data'])
             elif chunk['type'] == 'WordBoundary':
-                # Timestamps are in 100-nanosecond units
                 start_sec = chunk['offset'] / 10_000_000
                 dur_sec   = chunk['duration'] / 10_000_000
                 end_sec   = start_sec + dur_sec
@@ -58,9 +57,20 @@ async def synthesize(text: str, voice: str, audio_path: str, meta_path: str):
                     'text':  chunk['text'],
                     'start': round(start_sec, 3),
                     'end':   round(end_sec, 3),
-                    # Also expose in milliseconds for Remotion interpolate()
                     'startMs': round(start_sec * 1000),
                     'endMs':   round(end_sec * 1000),
+                })
+            elif chunk['type'] == 'SentenceBoundary':
+                start_sec = chunk['offset'] / 10_000_000
+                dur_sec   = chunk['duration'] / 10_000_000
+                end_sec   = start_sec + dur_sec
+                subtitles.append({
+                    'text':  chunk['text'],
+                    'start': round(start_sec, 3),
+                    'end':   round(end_sec, 3),
+                    'startMs': round(start_sec * 1000),
+                    'endMs':   round(end_sec * 1000),
+                    'type':  'sentence',
                 })
 
     # ── Measure real duration from the MP3 file (authoritative) ──────────────
