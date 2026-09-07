@@ -262,6 +262,55 @@ export async function applyFades(inputPath, outputPath, fadeSec = 0.5) {
 }
 
 /**
+ * Generate an SRT subtitle file from section word timestamps.
+ *
+ * Word timestamps from Edge-TTS are relative to each section's audio file.
+ * This function offsets each section's words by the cumulative video time so
+ * the SRT entries align with the final stitched video.
+ *
+ * @param {SectionModel[]} sections
+ * @param {string}         outputSrtPath - where to write the .srt file
+ */
+export function generateSrtFile(sections, outputSrtPath) {
+  const WORDS_PER_LINE = 8;
+  const entries = [];
+  let cumulativeSec = 0;
+
+  for (const section of sections) {
+    // Filter to word-level only (exclude SentenceBoundary type entries)
+    const words = (section.subtitles || []).filter(w => !w.type);
+
+    // Group words into caption lines of ~8 words each
+    for (let i = 0; i < words.length; i += WORDS_PER_LINE) {
+      const chunk = words.slice(i, i + WORDS_PER_LINE);
+      if (chunk.length === 0) continue;
+      const startSec = cumulativeSec + chunk[0].start;
+      const endSec   = cumulativeSec + chunk[chunk.length - 1].end;
+      entries.push({ startSec: Math.max(0, startSec), endSec, text: chunk.map(w => w.text).join(' ') });
+    }
+
+    cumulativeSec += section.actualDurationSec || section.estimatedDurationSec || 0;
+  }
+
+  const srt = entries.map((e, i) => (
+    `${i + 1}\n${srtTimestamp(e.startSec)} --> ${srtTimestamp(e.endSec)}\n${e.text}`
+  )).join('\n\n');
+
+  fs.writeFileSync(outputSrtPath, srt + '\n', 'utf-8');
+  console.log(`[FFmpeg] SRT written: ${path.basename(outputSrtPath)} (${entries.length} cues)`);
+}
+
+function srtTimestamp(secs) {
+  const h  = Math.floor(secs / 3600);
+  const m  = Math.floor((secs % 3600) / 60);
+  const s  = Math.floor(secs % 60);
+  const ms = Math.round((secs % 1) * 1000);
+  return `${zp(h)}:${zp(m)}:${zp(s)},${zp(ms, 3)}`;
+}
+
+function zp(n, len = 2) { return String(n).padStart(len, '0'); }
+
+/**
  * Get video duration in seconds.
  * FFmpeg always writes Duration to stderr, not stdout.
  * @param {string} filePath

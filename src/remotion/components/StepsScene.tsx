@@ -17,7 +17,7 @@ export const StepsScene = ({ scene, bgMusicUrl, techPrimary, techSecondary }: an
 
   return (
     <AbsoluteFill className="scene">
-      <BackgroundGradients variant="concept" techPrimary={techPrimary} techSecondary={techSecondary} />
+      <BackgroundGradients variant="steps" techPrimary={techPrimary} techSecondary={techSecondary} />
       <div style={{ padding:'48px 80px 0', opacity:headerSpring, transform:`translateY(${interpolate(headerSpring,[0,1],[-30,0])}px)` }}>
         <div className="scene-tag">Steps</div>
         <h2 className="scene-title">{scene.title}</h2>

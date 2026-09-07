@@ -17,7 +17,7 @@ export const TimelineScene = ({ scene, bgMusicUrl, techPrimary, techSecondary }:
 
   return (
     <AbsoluteFill className="scene">
-      <BackgroundGradients variant="arch" techPrimary={techPrimary} techSecondary={techSecondary} />
+      <BackgroundGradients variant="timeline" techPrimary={techPrimary} techSecondary={techSecondary} />
       <div style={{ padding:'52px 80px 0', opacity:headerSpring, transform:`translateY(${interpolate(headerSpring,[0,1],[-30,0])}px)` }}>
         <div className="scene-tag">Timeline</div>
         <h2 className="scene-title">{scene.title}</h2>

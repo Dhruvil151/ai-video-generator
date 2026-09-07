@@ -47,6 +47,7 @@ export const SCENE_TYPES = {
   FILE_TREE:         'FileTreeScene',         // project directory structure
   CHAPTER:           'ChapterScene',          // section/chapter title card
   SEQUENCE_DIAGRAM:  'SequenceDiagramScene',  // actor message-flow diagram
+  STOCK_VIDEO:       'StockVideoScene',       // cinematic Pexels B-roll footage overlay
 };
 
 // ─── BullMQ Queue ────────────────────────────────────────────────────────────

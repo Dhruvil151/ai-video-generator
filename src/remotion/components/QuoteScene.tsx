@@ -16,7 +16,7 @@ export const QuoteScene = ({ scene, bgMusicUrl, techPrimary, techSecondary }: an
 
   return (
     <AbsoluteFill className="scene">
-      <BackgroundGradients variant="concept" techPrimary={techPrimary} techSecondary={techSecondary} />
+      <BackgroundGradients variant="quote" techPrimary={techPrimary} techSecondary={techSecondary} />
       {layout === 'centered'
         ? <CenteredQuote  quote={quote} author={author} context={context} title={scene.title} frame={frame} fps={fps} totalFrames={totalFrames} />
         : <LeftAccentQuote quote={quote} author={author} context={context} title={scene.title} frame={frame} fps={fps} />}

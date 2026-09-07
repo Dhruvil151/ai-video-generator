@@ -209,6 +209,9 @@ function normalizePayload(raw = {}) {
     description:     raw.description     || '',
     actors:          raw.actors          || [],
     messages:        raw.messages        || [],
+    // StockVideoScene fields
+    query:           raw.query           || '',
+    videoUrl:        raw.videoUrl        || '',
   };
 }
 

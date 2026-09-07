@@ -35,7 +35,7 @@ export const TerminalScene = ({ scene, techPrimary, techSecondary }: any) => {
 
   return (
     <AbsoluteFill className="scene">
-      <BackgroundGradients variant="code" techPrimary={techPrimary} techSecondary={techSecondary} />
+      <BackgroundGradients variant="terminal" techPrimary={techPrimary} techSecondary={techSecondary} />
       <div style={{ padding:'48px 80px 0', opacity:headerSpring, transform:`translateY(${interpolate(headerSpring,[0,1],[-30,0])}px)` }}>
         <div className="scene-tag">Terminal</div>
         <h2 className="scene-title">{scene.title}</h2>

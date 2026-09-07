@@ -25,4 +25,8 @@ export const ENV = {
   TEMP_DIR:    path.resolve(__dirname, '../../temp'),
   ASSETS_DIR:  path.resolve(__dirname, '../../assets'),
   MUSIC_DIR:   path.resolve(__dirname, '../../assets/music'),
+  BROLL_DIR:   path.resolve(__dirname, '../../public/broll'),
+
+  // Pexels API key (optional — B-roll fetching disabled when absent)
+  PEXELS_API_KEY: process.env.PEXELS_API_KEY || '',
 };

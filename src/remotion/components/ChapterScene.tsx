@@ -46,7 +46,7 @@ export const ChapterScene: React.FC<ChapterSceneProps> = ({ scene, techPrimary, 
 
   return (
     <AbsoluteFill className="scene">
-      <BackgroundGradients variant="default" techPrimary={techPrimary} techSecondary={techSecondary} />
+      <BackgroundGradients variant="chapter" techPrimary={techPrimary} techSecondary={techSecondary} />
 
       <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 160px', textAlign: 'center' }}>
         {chapterNumber !== '' && (

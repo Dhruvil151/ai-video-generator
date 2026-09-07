@@ -26,7 +26,8 @@ import { ENV } from '../config/env.js';
 import { ScriptModel } from '../models/Script.js';
 import { TTSService } from './ttsService.js';
 import { bundleComposition, renderScene, computeSceneTimings } from './remotionRenderService.js';
-import { stitchScenesWithAudio, mixBackgroundMusic, applyFades } from './ffmpegService.js';
+import { stitchScenesWithAudio, mixBackgroundMusic, applyFades, generateSrtFile } from './ffmpegService.js';
+import { fetchBRollClip } from './pexelsService.js';
 import { cleanJobTemp, getJobTempDir } from '../utils/fileHelper.js';
 import { JOB_STATUS } from '../models/RenderJob.js';
 
@@ -98,6 +99,21 @@ export async function runRenderPipeline(bullJob, model, rawScript, options = {})
         `TTS ${batchEnd}/${sections.length} sections complete`);
     }
 
+    // ── Phase A.5: Fetch B-roll clips for StockVideoScene visuals ─────────────
+    for (const section of sections) {
+      for (const visual of section.visuals) {
+        if (visual.type === 'StockVideoScene') {
+          const query  = visual.payload?.query || visual.title || script.topic;
+          const fileId = `broll_job${jobId}_${visual.id}`;
+          const clip   = await fetchBRollClip(query, fileId);
+          if (clip) {
+            visual.payload.videoUrl = `http://localhost:${ENV.PORT}${clip.url}`;
+            console.log(`[Pipeline] B-roll fetched: "${query}" → ${clip.url}`);
+          }
+        }
+      }
+    }
+
     // Flatten sections → renderable scene objects for Remotion
     // Each visual becomes one scene-like object; Remotion still renders muted
     const renderableScenes = sections.flatMap(s => s.toRenderableScenes());
@@ -162,7 +178,9 @@ export async function runRenderPipeline(bullJob, model, rawScript, options = {})
     // Determine final output filename
     const slug       = script.topic.toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 32);
     const outputFile = `${slug}_${jobId}.mp4`;
+    const srtFile    = `${slug}_${jobId}.srt`;
     const outputPath = path.join(ENV.OUTPUT_DIR, outputFile);
+    const srtPath    = path.join(ENV.OUTPUT_DIR, srtFile);
 
     // Check for background music
     const musicFile = path.join(ENV.MUSIC_DIR, 'background.mp3');
@@ -184,22 +202,32 @@ export async function runRenderPipeline(bullJob, model, rawScript, options = {})
       await applyFades(concatPath, outputPath, 0.5);
     }
 
+    // ── Generate SRT subtitle file ─────────────────────────────────────────────
+    try {
+      generateSrtFile(sections, srtPath);
+    } catch (srtErr) {
+      console.warn(`[Pipeline] SRT generation failed (non-fatal): ${srtErr.message}`);
+    }
+
     // ── Phase E: Cleanup ───────────────────────────────────────────────────────
     await reportProgress(bullJob, model, JOB_STATUS.STITCHING, 98, 'Cleaning up temp files…');
     cleanJobTemp(jobId);
 
     // ── Done ───────────────────────────────────────────────────────────────────
     const outputUrl  = `/public/output/${outputFile}`;
+    const srtUrl     = `/public/output/${srtFile}`;
     if (model) {
       model.outputVideoPath = outputPath;
       model.outputVideoUrl  = outputUrl;
+      model.srtUrl          = srtUrl;
       model.updateProgress(JOB_STATUS.COMPLETED, 100, 'Video ready!');
     }
 
     await reportProgress(bullJob, model, JOB_STATUS.COMPLETED, 100, `Video ready: ${outputUrl}`);
     console.log(`[Pipeline] ✓ Job ${jobId} complete → ${outputPath}`);
+    console.log(`[Pipeline] ✓ SRT: ${srtPath}`);
 
-    return { outputPath, outputUrl };
+    return { outputPath, outputUrl, srtPath, srtUrl };
 
   } catch (err) {
     console.error(`[Pipeline] ✗ Job ${jobId} failed:`, err.message);

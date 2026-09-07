@@ -66,7 +66,7 @@ export const LineChartScene: React.FC<LineChartSceneProps> = ({ scene, techPrima
 
   return (
     <AbsoluteFill className="scene">
-      <BackgroundGradients variant="concept" techPrimary={techPrimary} techSecondary={techSecondary} />
+      <BackgroundGradients variant="stats" techPrimary={techPrimary} techSecondary={techSecondary} />
 
       <div style={{ padding: '52px 80px 0', opacity: headerSpring, transform: `translateY(${interpolate(headerSpring, [0, 1], [-30, 0])}px)`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>

@@ -17,7 +17,7 @@ import { LineChartScene }    from './components/LineChartScene';
 import { FileTreeScene }     from './components/FileTreeScene';
 import { ChapterScene }      from './components/ChapterScene';
 import { SequenceDiagramScene } from './components/SequenceDiagramScene';
-import { SubtitlesOverlay, estimateSubtitles } from './components/SubtitlesOverlay';
+import { StockVideoScene }  from './components/StockVideoScene';
 import { getTechTheme } from './utils/getTechTheme';
 import './styles/video.css';
 
@@ -59,6 +59,7 @@ const SCENE_COMPONENTS: Record<string, React.ComponentType<any>> = {
   FileTreeScene,
   ChapterScene,
   SequenceDiagramScene,
+  StockVideoScene,
 };
 
 const FADE_FRAMES = 10;
@@ -100,14 +101,7 @@ export const EducationalVideo: React.FC<EducationalVideoProps> = ({ scenes, bgMu
                 techPrimary={techTheme.primary}
                 techSecondary={techTheme.secondary}
               />
-              {/* TODO P3: SoundEffects — play short audio clips (whoosh, ping) on scene transitions and key data reveals. Requires Remotion Audio with zero-duration sound effect files in public/sfx/ */}
-              <SubtitlesOverlay
-                subtitles={
-                  scene.subtitles && scene.subtitles.length > 0
-                    ? scene.subtitles
-                    : estimateSubtitles(scene.narration, scene.actualDurationSec || scene.estimatedDurationSec || 10)
-                }
-              />
+              {/* Subtitles removed from burn-in — generated as external .srt file alongside the video */}
             </SceneTransition>
           </Sequence>
         );
