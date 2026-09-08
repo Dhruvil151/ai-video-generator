@@ -277,16 +277,27 @@ export function generateSrtFile(sections, outputSrtPath) {
   let cumulativeSec = 0;
 
   for (const section of sections) {
-    // Filter to word-level only (exclude SentenceBoundary type entries)
-    const words = (section.subtitles || []).filter(w => !w.type);
+    const all       = section.subtitles || [];
+    const wordLevel = all.filter(w => !w.type);   // WordBoundary — individual words
+    const sentLevel = all.filter(w => w.type === 'sentence'); // SentenceBoundary — full sentences
 
-    // Group words into caption lines of ~8 words each
-    for (let i = 0; i < words.length; i += WORDS_PER_LINE) {
-      const chunk = words.slice(i, i + WORDS_PER_LINE);
-      if (chunk.length === 0) continue;
-      const startSec = cumulativeSec + chunk[0].start;
-      const endSec   = cumulativeSec + chunk[chunk.length - 1].end;
-      entries.push({ startSec: Math.max(0, startSec), endSec, text: chunk.map(w => w.text).join(' ') });
+    if (wordLevel.length > 0) {
+      // Preferred: group individual word timestamps into 8-word caption lines
+      for (let i = 0; i < wordLevel.length; i += WORDS_PER_LINE) {
+        const chunk = wordLevel.slice(i, i + WORDS_PER_LINE);
+        const startSec = cumulativeSec + chunk[0].start;
+        const endSec   = cumulativeSec + chunk[chunk.length - 1].end;
+        entries.push({ startSec: Math.max(0, startSec), endSec, text: chunk.map(w => w.text).join(' ') });
+      }
+    } else if (sentLevel.length > 0) {
+      // Fallback: Edge TTS only fired SentenceBoundary events — use full sentences as cues
+      for (const sent of sentLevel) {
+        entries.push({
+          startSec: Math.max(0, cumulativeSec + sent.start),
+          endSec:   cumulativeSec + sent.end,
+          text:     sent.text,
+        });
+      }
     }
 
     cumulativeSec += section.actualDurationSec || section.estimatedDurationSec || 0;
