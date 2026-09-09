@@ -77,6 +77,8 @@ export class RenderJobModel {
       totalScenes:     this.totalScenes,
       completedScenes: this.completedScenes,
       outputVideoUrl:  this.outputVideoUrl,
+      srtUrl:          this.srtUrl || null,
+      warnings:        this.warnings || [],
       error:           this.error,
       startedAt:       this.startedAt,
       completedAt:     this.completedAt,

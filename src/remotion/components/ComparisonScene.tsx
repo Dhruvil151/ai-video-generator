@@ -80,19 +80,19 @@ export const ComparisonScene: React.FC<ComparisonSceneProps> = ({ scene, bgMusic
         {/* Left column */}
         <div style={{
           flex: 1, padding: '40px',
-          background: 'rgba(239,68,68,0.05)',
-          border: '1px solid rgba(239,68,68,0.2)',
-          borderTop: '3px solid #EF4444',
+          background: 'rgba(85,164,206,0.05)',
+          border: '1px solid rgba(85,164,206,0.2)',
+          borderTop: '3px solid #55A4CE',
           borderRadius: '20px 0 0 20px',
           opacity: leftSpring,
           transform: `translateX(${interpolate(leftSpring, [0, 1], [-60, 0])}px)`,
         }}>
           <div style={{
             fontFamily: "'Outfit', sans-serif", fontSize: '38px', fontWeight: 800,
-            color: '#EF4444', marginBottom: '32px',
+            color: '#55A4CE', marginBottom: '32px',
             display: 'flex', alignItems: 'center', gap: '14px',
           }}>
-            <SvgIcon name="x-circle" size={32} color="#EF4444" /> {leftTitle}
+            <SvgIcon name="arrow-right" size={32} color="#55A4CE" /> {leftTitle}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {leftPts.slice(0, 5).map((pt, i) => {
@@ -103,8 +103,8 @@ export const ComparisonScene: React.FC<ComparisonSceneProps> = ({ scene, bgMusic
                   opacity: itemSpring,
                   transform: `translateX(${interpolate(itemSpring, [0, 1], [-20, 0])}px)`,
                 }}>
-                  <span style={{ color: '#EF4444', fontSize: '24px', marginTop: '2px', flexShrink: 0 }}>●</span>
-                  <span style={{ fontSize: '26px', color: '#8B949E', lineHeight: 1.5 }}>{pt}</span>
+                  <span style={{ color: '#55A4CE', fontSize: '24px', marginTop: '2px', flexShrink: 0 }}>●</span>
+                  <span style={{ fontSize: '26px', color: '#E6EDF3', lineHeight: 1.5 }}>{pt}</span>
                 </div>
               );
             })}
@@ -129,7 +129,7 @@ export const ComparisonScene: React.FC<ComparisonSceneProps> = ({ scene, bgMusic
           borderRadius: '50%',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontFamily: 'JetBrains Mono, monospace', fontSize: '22px', fontWeight: 700,
-          color: '#8B949E',
+          color: '#E6EDF3',
           opacity: dividerSpring,
           zIndex: 10,
         }}>VS</div>
@@ -149,7 +149,7 @@ export const ComparisonScene: React.FC<ComparisonSceneProps> = ({ scene, bgMusic
             color: '#10B981', marginBottom: '32px',
             display: 'flex', alignItems: 'center', gap: '14px',
           }}>
-            <SvgIcon name="check-circle" size={32} color="#10B981" /> {rightTitle}
+            <SvgIcon name="arrow-right" size={32} color="#10B981" /> {rightTitle}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {rightPts.slice(0, 5).map((pt, i) => {

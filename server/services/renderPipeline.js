@@ -26,7 +26,9 @@ import { ENV } from '../config/env.js';
 import { ScriptModel } from '../models/Script.js';
 import { TTSService } from './ttsService.js';
 import { bundleComposition, renderScene, computeSceneTimings } from './remotionRenderService.js';
-import { stitchScenesWithAudio, mixBackgroundMusic, applyFades, generateSrtFile } from './ffmpegService.js';
+import { stitchSections, mixBackgroundMusic, applyFades, generateSrtFile } from './ffmpegService.js';
+import { validateStoryboard, assertRenderSupport } from './storyboardValidation.js';
+import { writeRenderManifest } from './renderManifest.js';
 import { fetchBRollClip } from './pexelsService.js';
 import { cleanJobTemp, getJobTempDir } from '../utils/fileHelper.js';
 import { JOB_STATUS } from '../models/RenderJob.js';
@@ -71,6 +73,9 @@ export async function runRenderPipeline(bullJob, model, rawScript, options = {})
     await reportProgress(bullJob, model, JOB_STATUS.GENERATING_AUDIO, 2, 'Synthesizing voiceover audio…');
 
     const sections = script.sections;
+    const warnings = validateStoryboard(script);
+    // Storage/editing allow example-referencing scripts; rendering does not yet (Phase 4).
+    assertRenderSupport(script);
     const BATCH_SIZE = 3;
 
     for (let i = 0; i < sections.length; i += BATCH_SIZE) {
@@ -90,7 +95,7 @@ export async function runRenderPipeline(bullJob, model, rawScript, options = {})
         section.actualDurationSec = durationSec || section.estimatedDurationSec;
 
         // Distribute audio duration across this section's visuals
-        section.populateVisualTimings();
+        section.populateVisualTimings(script.examples);
       }));
 
       const batchEnd = Math.min(i + BATCH_SIZE, sections.length);
@@ -143,6 +148,7 @@ export async function runRenderPipeline(bullJob, model, rawScript, options = {})
         fromFrame,
         durationFrames,
         scenes: renderableScenes.map(s => ({ ...s, audioUrl: null })),
+        examples: script.examples,
         bgMusicUrl: null,
         topic: script.topic || '',
         outputPath: sceneFile,
@@ -158,22 +164,8 @@ export async function runRenderPipeline(bullJob, model, rawScript, options = {})
 
     // Each visual descriptor includes audioStartSec: where in the section audio it starts.
     // FFmpeg atrim uses start:end offsets so visuals 2+ get the correct portion of the audio.
-    const sceneDescriptors = [];
-    let visualIdx = 0;
-    for (const section of sections) {
-      for (const visual of section.visuals) {
-        sceneDescriptors.push({
-          videoPath:     scenePaths[visualIdx],
-          audioPath:     section.audioPath,
-          audioStartSec: visual.startSec,
-          durationSec:   visual.durationSec,
-        });
-        visualIdx++;
-      }
-    }
-
     const concatPath = path.join(tempDir, 'raw_concat.lossless.mp4');
-    await stitchScenesWithAudio(sceneDescriptors, concatPath);
+    await stitchSections(scenePaths, sections, concatPath);
 
     // Determine final output filename
     const slug       = script.topic.toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 32);
@@ -202,12 +194,21 @@ export async function runRenderPipeline(bullJob, model, rawScript, options = {})
       await applyFades(concatPath, outputPath, 0.5);
     }
 
+    let captionsAvailable = false;
     // ── Generate SRT subtitle file ─────────────────────────────────────────────
     try {
       generateSrtFile(sections, srtPath);
+      captionsAvailable = true;
     } catch (srtErr) {
+      warnings.push({ code:'captions-unavailable', message:srtErr.message });
       console.warn(`[Pipeline] SRT generation failed (non-fatal): ${srtErr.message}`);
     }
+    script.recalculateActualDuration();
+    for (const section of sections) {
+      if (!section.subtitles.length) warnings.push({code:'section-captions-missing',message:`No captions for ${section.id}`});
+      else if (section.subtitles.every(c=>c.type==='sentence')) warnings.push({code:'estimated-caption-segmentation',message:`Sentence timing subdivided approximately for ${section.id}`});
+    }
+    const manifestPath = writeRenderManifest(script, outputPath, { warnings, captionsAvailable });
 
     // ── Phase E: Cleanup ───────────────────────────────────────────────────────
     await reportProgress(bullJob, model, JOB_STATUS.STITCHING, 98, 'Cleaning up temp files…');
@@ -215,7 +216,7 @@ export async function runRenderPipeline(bullJob, model, rawScript, options = {})
 
     // ── Done ───────────────────────────────────────────────────────────────────
     const outputUrl  = `/public/output/${outputFile}`;
-    const srtUrl     = `/public/output/${srtFile}`;
+    const srtUrl     = captionsAvailable ? `/public/output/${srtFile}` : null;
     if (model) {
       model.outputVideoPath = outputPath;
       model.outputVideoUrl  = outputUrl;
@@ -227,7 +228,7 @@ export async function runRenderPipeline(bullJob, model, rawScript, options = {})
     console.log(`[Pipeline] ✓ Job ${jobId} complete → ${outputPath}`);
     console.log(`[Pipeline] ✓ SRT: ${srtPath}`);
 
-    return { outputPath, outputUrl, srtPath, srtUrl };
+    return { outputPath, outputUrl, srtPath: captionsAvailable ? srtPath : null, srtUrl, manifestPath, warnings };
 
   } catch (err) {
     console.error(`[Pipeline] ✗ Job ${jobId} failed:`, err.message);

@@ -1,0 +1,43 @@
+{
+  "source": "Simple Icons",
+  "licenseReference": "https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md",
+  "note": "Third-party icon distribution. Trademark rights and brand guidelines remain separate. Other legacy TechLogos components are project approximations, not verified official assets.",
+  "icons": [
+    {
+      "name": "redis",
+      "file": "public/tech/redis.svg",
+      "source": "https://github.com/simple-icons/simple-icons/blob/develop/icons/redis.svg",
+      "sha256": "428b86deb14c8bdacdcdf75987fe454f367bcd078a7e4ae3f84de29aa5bdf136"
+    },
+    {
+      "name": "docker",
+      "file": "public/tech/docker.svg",
+      "source": "https://github.com/simple-icons/simple-icons/blob/develop/icons/docker.svg",
+      "sha256": "65571291c261ef869c31540a38f3ca0f0ee3bb73f179c172211c8860f19a6359"
+    },
+    {
+      "name": "react",
+      "file": "public/tech/react.svg",
+      "source": "https://github.com/simple-icons/simple-icons/blob/develop/icons/react.svg",
+      "sha256": "ab9136a1a4a8be72ac6743e1bdd1912d878bd68d57787ea7a6c6838e3b23c01c"
+    },
+    {
+      "name": "javascript",
+      "file": "public/tech/javascript.svg",
+      "source": "https://github.com/simple-icons/simple-icons/blob/develop/icons/javascript.svg",
+      "sha256": "c9be35a7a861ebe80ae4ee706d05004b99ee59fc63db69da6dcc10776718434b"
+    },
+    {
+      "name": "typescript",
+      "file": "public/tech/typescript.svg",
+      "source": "https://github.com/simple-icons/simple-icons/blob/develop/icons/typescript.svg",
+      "sha256": "7f023e8d1e767370306ec9437d2de5d5af97491d6208dd7799a3808a7c10a36a"
+    },
+    {
+      "name": "nodedotjs",
+      "file": "public/tech/nodedotjs.svg",
+      "source": "https://github.com/simple-icons/simple-icons/blob/develop/icons/nodedotjs.svg",
+      "sha256": "021851b758cde7d3e04819c3ac02047d0ff281c712e8387afa0c76a6dac6db6c"
+    }
+  ]
+}

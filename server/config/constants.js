@@ -28,6 +28,7 @@ export const DEFAULT_VOICE = 'en-US-GuyNeural';
 
 // ─── Scene Types ─────────────────────────────────────────────────────────────
 export const SCENE_TYPES = {
+  MECHANISM:    'MechanismScene',
   TITLE:        'TitleScene',
   CODE_EDITOR:  'CodeEditorScene',
   ARCHITECTURE: 'ArchitectureScene',

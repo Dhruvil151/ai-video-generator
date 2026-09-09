@@ -1,0 +1,1164 @@
+{
+  "manifestVersion": 1,
+  "createdAt": "2026-09-08T11:13:21.921Z",
+  "renderer": {
+    "fps": 30,
+    "width": 1920,
+    "height": 1080,
+    "frameFormat": "png",
+    "intermediateCrf": 0,
+    "finalCrf": 16
+  },
+  "script": {
+    "id": "script_1788847859456",
+    "schemaVersion": 1,
+    "brief": {},
+    "generation": {
+      "source": "imported"
+    },
+    "topic": "React Hooks",
+    "mode": "short",
+    "targetDurationMinutes": 3,
+    "estimatedTotalDurationSec": 152.7,
+    "actualTotalDurationSec": 0,
+    "voice": "en-US-ChristopherNeural",
+    "sections": [
+      {
+        "id": "section_1",
+        "narration": "For years, React developers suffered through lifecycle soup. You wrote setup logic in componentDidMount, duplicate teardown in componentWillUnmount, and synced prop changes inside componentDidUpdate. One logical feature was chopped into three distinct places, bound together by chaotic this bindings and wrapper hell. <break time='0.6s'/> React Hooks didn't just shorten your code — they completely revolutionized React by decoupling stateful logic from class lifecycles. Instead of grouping code by when it runs, hooks let you group code by what it actually does. But behind that clean functional syntax lies a persistent array structure in Fiber nodes that trips up almost every developer. Understanding this hidden mechanism is the exact difference between fighting stale renders and mastering React.",
+        "objective": "",
+        "visuals": [
+          {
+            "id": "section_1_v0",
+            "type": "TitleScene",
+            "title": "React Hooks Mechanics",
+            "subtitle": "Why they work the way they do",
+            "purpose": "",
+            "narrationAnchor": "",
+            "continuityId": "",
+            "beats": [],
+            "durationFrames": 0,
+            "durationFraction": 0.5,
+            "startSec": 0,
+            "durationSec": 0,
+            "payload": {
+              "engine": "",
+              "inputs": {},
+              "layout": "orbital",
+              "code": "",
+              "language": "javascript",
+              "filename": "index.js",
+              "highlightLines": [],
+              "callout": "",
+              "nodes": [],
+              "connections": [],
+              "flowDescription": "",
+              "bulletPoints": [],
+              "badges": [
+                "Fiber Nodes",
+                "Call Order",
+                "Closures"
+              ],
+              "keyTakeaway": "Hooks aren't magic — they are linked lists attached to Fiber nodes",
+              "leftTitle": "",
+              "leftPoints": [],
+              "rightTitle": "",
+              "rightPoints": [],
+              "topicTag": "React",
+              "steps": [],
+              "stats": [],
+              "commands": [],
+              "termTitle": "Terminal",
+              "quote": "",
+              "author": "",
+              "context": "",
+              "diffLines": [],
+              "headers": [],
+              "rows": [],
+              "xLabels": [],
+              "series": [],
+              "yUnit": "",
+              "rootName": "",
+              "tree": [],
+              "chapterNumber": "",
+              "chapterTitle": "",
+              "description": "",
+              "actors": [],
+              "messages": [],
+              "query": "",
+              "videoUrl": ""
+            }
+          },
+          {
+            "id": "section_1_v1",
+            "type": "ComparisonScene",
+            "title": "Component Architecture",
+            "subtitle": "Classes vs Hooks",
+            "purpose": "",
+            "narrationAnchor": "",
+            "continuityId": "",
+            "beats": [],
+            "durationFrames": 0,
+            "durationFraction": 0.5,
+            "startSec": 0,
+            "durationSec": 0,
+            "payload": {
+              "engine": "",
+              "inputs": {},
+              "layout": "split",
+              "code": "",
+              "language": "javascript",
+              "filename": "index.js",
+              "highlightLines": [],
+              "callout": "",
+              "nodes": [],
+              "connections": [],
+              "flowDescription": "",
+              "bulletPoints": [],
+              "badges": [],
+              "keyTakeaway": "",
+              "leftTitle": "Class Lifecycle Model",
+              "leftPoints": [
+                "Code split by timing (mount/update/unmount)",
+                "Complex 'this' binding contexts",
+                "Wrapper hell from Higher-Order Components",
+                "Stateful logic tied strictly to class instance"
+              ],
+              "rightTitle": "Hooks Composition Model",
+              "rightPoints": [
+                "Code grouped by feature and concern",
+                "Pure function components without 'this'",
+                "Flat tree composition via custom hooks",
+                "State saved in Fiber linked lists"
+              ],
+              "topicTag": "",
+              "steps": [],
+              "stats": [],
+              "commands": [],
+              "termTitle": "Terminal",
+              "quote": "",
+              "author": "",
+              "context": "",
+              "diffLines": [],
+              "headers": [],
+              "rows": [],
+              "xLabels": [],
+              "series": [],
+              "yUnit": "",
+              "rootName": "",
+              "tree": [],
+              "chapterNumber": "",
+              "chapterTitle": "",
+              "description": "",
+              "actors": [],
+              "messages": [],
+              "query": "",
+              "videoUrl": ""
+            }
+          }
+        ],
+        "audioPath": "job-36.assets/section-0.mp3",
+        "audioUrl": null,
+        "actualDurationSec": 49.800000000000004,
+        "estimatedDurationSec": 49.457142857142856,
+        "subtitles": [
+          {
+            "text": "For years, React developers suffered through lifecycle soup.",
+            "start": 0.1,
+            "end": 4.537,
+            "startMs": 100,
+            "endMs": 4538,
+            "type": "sentence"
+          },
+          {
+            "text": "You wrote setup logic in componentDidMount, duplicate teardown in componentWillUnmount, and synced prop changes inside componentDidUpdate.",
+            "start": 4.487,
+            "end": 13.462,
+            "startMs": 4488,
+            "endMs": 13462,
+            "type": "sentence"
+          },
+          {
+            "text": "One logical feature was chopped into three distinct places, bound together by chaotic this bindings and wrapper hell.",
+            "start": 13.463,
+            "end": 20.9,
+            "startMs": 13462,
+            "endMs": 20900,
+            "type": "sentence"
+          },
+          {
+            "text": "React Hooks didn't just shorten your code — they completely revolutionized React by decoupling stateful logic from class lifecycles.",
+            "start": 20.9,
+            "end": 29.4,
+            "startMs": 20900,
+            "endMs": 29400,
+            "type": "sentence"
+          },
+          {
+            "text": "Instead of grouping code by when it runs, hooks let you group code by what it actually does.",
+            "start": 29.4,
+            "end": 35.112,
+            "startMs": 29400,
+            "endMs": 35112,
+            "type": "sentence"
+          },
+          {
+            "text": "But behind that clean functional syntax lies a persistent array structure in Fiber nodes that trips up almost every developer.",
+            "start": 35.112,
+            "end": 42.6,
+            "startMs": 35112,
+            "endMs": 42600,
+            "type": "sentence"
+          },
+          {
+            "text": "Understanding this hidden mechanism is the exact difference between fighting stale renders and mastering React.",
+            "start": 42.6,
+            "end": 49.15,
+            "startMs": 42600,
+            "endMs": 49150,
+            "type": "sentence"
+          }
+        ]
+      },
+      {
+        "id": "section_2",
+        "narration": "Here is the core truth: React components are just JavaScript functions that re-run from scratch on every single render. So where does useState actually keep your data when the component function finishes executing? <break time='0.6s'/> React attaches a hidden linked list directly to your component's internal Fiber node in memory. Every single time a hook runs, React steps forward through that list using an internal index pointer. This is why the Rules of Hooks exist. When you call useState conditionally inside an if block, you shift the execution indices for every single hook that follows. React doesn't identify your state by variable names — it identifies state strictly by call order. Shift that order, and your state quietly cross-contaminates. Once you realize hooks rely on pointer offsets, early returns and conditional hooks suddenly make complete sense.",
+        "objective": "",
+        "visuals": [
+          {
+            "id": "section_2_v0",
+            "type": "ArchitectureScene",
+            "title": "Inside Fiber: The Hook LinkedList",
+            "subtitle": "How React persists state across renders",
+            "purpose": "",
+            "narrationAnchor": "",
+            "continuityId": "",
+            "beats": [],
+            "durationFrames": 0,
+            "durationFraction": 0.55,
+            "startSec": 0,
+            "durationSec": 0,
+            "payload": {
+              "engine": "",
+              "inputs": {},
+              "layout": "flow",
+              "code": "",
+              "language": "javascript",
+              "filename": "index.js",
+              "highlightLines": [],
+              "callout": "",
+              "nodes": [
+                {
+                  "id": "1",
+                  "label": "React",
+                  "icon": "code"
+                },
+                {
+                  "id": "2",
+                  "label": "Fiber Node",
+                  "icon": "layers"
+                },
+                {
+                  "id": "3",
+                  "label": "Hook 0: useState",
+                  "icon": "database"
+                },
+                {
+                  "id": "4",
+                  "label": "Hook 1: useEffect",
+                  "icon": "refresh-cw"
+                },
+                {
+                  "id": "5",
+                  "label": "Hook 2: useRef",
+                  "icon": "box"
+                }
+              ],
+              "connections": [
+                {
+                  "from": "1",
+                  "to": "2",
+                  "label": "renders"
+                },
+                {
+                  "from": "2",
+                  "to": "3",
+                  "label": "memoizedState"
+                },
+                {
+                  "from": "3",
+                  "to": "4",
+                  "label": "next"
+                },
+                {
+                  "from": "4",
+                  "to": "5",
+                  "label": "next"
+                }
+              ],
+              "flowDescription": "",
+              "bulletPoints": [],
+              "badges": [],
+              "keyTakeaway": "",
+              "leftTitle": "",
+              "leftPoints": [],
+              "rightTitle": "",
+              "rightPoints": [],
+              "topicTag": "",
+              "steps": [],
+              "stats": [],
+              "commands": [],
+              "termTitle": "Terminal",
+              "quote": "",
+              "author": "",
+              "context": "",
+              "diffLines": [],
+              "headers": [],
+              "rows": [],
+              "xLabels": [],
+              "series": [],
+              "yUnit": "",
+              "rootName": "",
+              "tree": [],
+              "chapterNumber": "",
+              "chapterTitle": "",
+              "description": "",
+              "actors": [],
+              "messages": [],
+              "query": "",
+              "videoUrl": ""
+            }
+          },
+          {
+            "id": "section_2_v1",
+            "type": "CodeEditorScene",
+            "title": "The Golden Rule of Hooks",
+            "subtitle": "Never call hooks inside conditions",
+            "purpose": "",
+            "narrationAnchor": "",
+            "continuityId": "",
+            "beats": [],
+            "durationFrames": 0,
+            "durationFraction": 0.45,
+            "startSec": 0,
+            "durationSec": 0,
+            "payload": {
+              "engine": "",
+              "inputs": {},
+              "layout": "fullscreen",
+              "code": "function UserProfile({ userId }) {\n  // ❌ BAD: Conditional hook breaks index order!\n  if (userId) {\n    const [user] = useState(null);\n  }\n  \n  // Fiber memoizedState pointer gets desynchronized!\n  const [theme] = useState('dark');\n}",
+              "language": "javascript",
+              "filename": "UserProfile.jsx",
+              "highlightLines": [
+                3,
+                4,
+                8
+              ],
+              "callout": "Hooks must run in the exact same sequence on every render!",
+              "nodes": [],
+              "connections": [],
+              "flowDescription": "",
+              "bulletPoints": [],
+              "badges": [],
+              "keyTakeaway": "",
+              "leftTitle": "",
+              "leftPoints": [],
+              "rightTitle": "",
+              "rightPoints": [],
+              "topicTag": "",
+              "steps": [],
+              "stats": [],
+              "commands": [],
+              "termTitle": "Terminal",
+              "quote": "",
+              "author": "",
+              "context": "",
+              "diffLines": [],
+              "headers": [],
+              "rows": [],
+              "xLabels": [],
+              "series": [],
+              "yUnit": "",
+              "rootName": "",
+              "tree": [],
+              "chapterNumber": "",
+              "chapterTitle": "",
+              "description": "",
+              "actors": [],
+              "messages": [],
+              "query": "",
+              "videoUrl": ""
+            }
+          }
+        ],
+        "audioPath": "job-36.assets/section-1.mp3",
+        "audioUrl": null,
+        "actualDurationSec": 55.2,
+        "estimatedDurationSec": 58.02857142857143,
+        "subtitles": [
+          {
+            "text": "Here is the core truth: React components are just JavaScript functions that re-run from scratch on every single render.",
+            "start": 0.1,
+            "end": 7.575,
+            "startMs": 100,
+            "endMs": 7575,
+            "type": "sentence"
+          },
+          {
+            "text": "So where does useState actually keep your data when the component function finishes executing?",
+            "start": 7.525,
+            "end": 13.05,
+            "startMs": 7525,
+            "endMs": 13050,
+            "type": "sentence"
+          },
+          {
+            "text": "React attaches a hidden linked list directly to your component's internal Fiber node in memory.",
+            "start": 13.05,
+            "end": 18.962,
+            "startMs": 13050,
+            "endMs": 18962,
+            "type": "sentence"
+          },
+          {
+            "text": "Every single time a hook runs, React steps forward through that list using an internal index pointer.",
+            "start": 18.962,
+            "end": 25.487,
+            "startMs": 18962,
+            "endMs": 25487,
+            "type": "sentence"
+          },
+          {
+            "text": "This is why the Rules of Hooks exist.",
+            "start": 25.488,
+            "end": 28.562,
+            "startMs": 25488,
+            "endMs": 28562,
+            "type": "sentence"
+          },
+          {
+            "text": "When you call useState conditionally inside an if block, you shift the execution indices for every single hook that follows.",
+            "start": 28.562,
+            "end": 36.2,
+            "startMs": 28562,
+            "endMs": 36200,
+            "type": "sentence"
+          },
+          {
+            "text": "React doesn't identify your state by variable names — it identifies state strictly by call order.",
+            "start": 36.2,
+            "end": 42.863,
+            "startMs": 36200,
+            "endMs": 42863,
+            "type": "sentence"
+          },
+          {
+            "text": "Shift that order, and your state quietly cross-contaminates.",
+            "start": 42.862,
+            "end": 47.175,
+            "startMs": 42862,
+            "endMs": 47175,
+            "type": "sentence"
+          },
+          {
+            "text": "Once you realize hooks rely on pointer offsets, early returns and conditional hooks suddenly make complete sense.",
+            "start": 47.175,
+            "end": 54.537,
+            "startMs": 47175,
+            "endMs": 54537,
+            "type": "sentence"
+          }
+        ]
+      },
+      {
+        "id": "section_3",
+        "narration": "This pointer-based memory model explains React's most frustrating bug: the stale closure. When a hook like useEffect or useCallback captures a variable, it closes over the exact value from that render pass. If your dependency array is missing a value, that closure stays frozen in time, reading snapshot values from the past. <break time='0.6s'/> You don't fix this by disabling ESLint warnings or blindly wrapping every function in useMemo. You fix it by passing functional updates like setCount prev to prev plus 1 or syncing via custom hooks. Respect the Fiber execution queue, keep your dependencies honest, and you will never debug a mystery render again.",
+        "objective": "",
+        "visuals": [
+          {
+            "id": "section_3_v0",
+            "type": "CodeDiffScene",
+            "title": "Solving Stale Closures",
+            "subtitle": "Functional updates vs stale snapshot",
+            "purpose": "",
+            "narrationAnchor": "",
+            "continuityId": "",
+            "beats": [],
+            "durationFrames": 0,
+            "durationFraction": 0.5,
+            "startSec": 0,
+            "durationSec": 0,
+            "payload": {
+              "engine": "",
+              "inputs": {},
+              "layout": "unified",
+              "code": "",
+              "language": "javascript",
+              "filename": "index.js",
+              "highlightLines": [],
+              "callout": "",
+              "nodes": [],
+              "connections": [],
+              "flowDescription": "",
+              "bulletPoints": [],
+              "badges": [],
+              "keyTakeaway": "",
+              "leftTitle": "",
+              "leftPoints": [],
+              "rightTitle": "",
+              "rightPoints": [],
+              "topicTag": "",
+              "steps": [],
+              "stats": [],
+              "commands": [],
+              "termTitle": "Terminal",
+              "quote": "",
+              "author": "",
+              "context": "",
+              "diffLines": [
+                {
+                  "type": "context",
+                  "text": "function Counter() {"
+                },
+                {
+                  "type": "context",
+                  "text": "  const [count, setCount] = useState(0);"
+                },
+                {
+                  "type": "context",
+                  "text": "  useEffect(() => {"
+                },
+                {
+                  "type": "context",
+                  "text": "    const timer = setInterval(() => {"
+                },
+                {
+                  "type": "remove",
+                  "text": "      setCount(count + 1); // Stale closure!"
+                },
+                {
+                  "type": "add",
+                  "text": "      setCount(prev => prev + 1); // Fresh value!"
+                },
+                {
+                  "type": "context",
+                  "text": "    }, 1000);"
+                },
+                {
+                  "type": "context",
+                  "text": "    return () => clearInterval(timer);"
+                },
+                {
+                  "type": "remove",
+                  "text": "  }, []); // count is trapped in initial closure"
+                },
+                {
+                  "type": "add",
+                  "text": "  }, []); // Safe without dependency"
+                },
+                {
+                  "type": "context",
+                  "text": "}"
+                }
+              ],
+              "headers": [],
+              "rows": [],
+              "xLabels": [],
+              "series": [],
+              "yUnit": "",
+              "rootName": "",
+              "tree": [],
+              "chapterNumber": "",
+              "chapterTitle": "",
+              "description": "",
+              "actors": [],
+              "messages": [],
+              "query": "",
+              "videoUrl": ""
+            }
+          },
+          {
+            "id": "section_3_v1",
+            "type": "SummaryScene",
+            "title": "Mastering React Hooks",
+            "subtitle": "Key takeaways for senior devs",
+            "purpose": "",
+            "narrationAnchor": "",
+            "continuityId": "",
+            "beats": [],
+            "durationFrames": 0,
+            "durationFraction": 0.5,
+            "startSec": 0,
+            "durationSec": 0,
+            "payload": {
+              "engine": "",
+              "inputs": {},
+              "layout": "checklist",
+              "code": "",
+              "language": "javascript",
+              "filename": "index.js",
+              "highlightLines": [],
+              "callout": "",
+              "nodes": [],
+              "connections": [],
+              "flowDescription": "",
+              "bulletPoints": [
+                {
+                  "title": "Linked List Memory",
+                  "description": "Hooks store state sequentially on the Fiber node memoizedState pointer."
+                },
+                {
+                  "title": "Unconditional Call Order",
+                  "description": "Never wrap hooks in conditions or loops to protect array index alignment."
+                },
+                {
+                  "title": "Snapshot Closures",
+                  "description": "Use functional updates or explicit deps to prevent frozen, stale state values."
+                }
+              ],
+              "badges": [],
+              "keyTakeaway": "Hooks aren't magic — once you understand the Fiber queue, bugs disappear.",
+              "leftTitle": "",
+              "leftPoints": [],
+              "rightTitle": "",
+              "rightPoints": [],
+              "topicTag": "",
+              "steps": [],
+              "stats": [],
+              "commands": [],
+              "termTitle": "Terminal",
+              "quote": "",
+              "author": "",
+              "context": "",
+              "diffLines": [],
+              "headers": [],
+              "rows": [],
+              "xLabels": [],
+              "series": [],
+              "yUnit": "",
+              "rootName": "",
+              "tree": [],
+              "chapterNumber": "",
+              "chapterTitle": "",
+              "description": "",
+              "actors": [],
+              "messages": [],
+              "query": "",
+              "videoUrl": ""
+            }
+          }
+        ],
+        "audioPath": "job-36.assets/section-2.mp3",
+        "audioUrl": null,
+        "actualDurationSec": 42.768,
+        "estimatedDurationSec": 45.17142857142857,
+        "subtitles": [
+          {
+            "text": "This pointer-based memory model explains React's most frustrating bug: the stale closure.",
+            "start": 0.1,
+            "end": 6.262,
+            "startMs": 100,
+            "endMs": 6262,
+            "type": "sentence"
+          },
+          {
+            "text": "When a hook like useEffect or useCallback captures a variable, it closes over the exact value from that render pass.",
+            "start": 6.213,
+            "end": 13.688,
+            "startMs": 6212,
+            "endMs": 13688,
+            "type": "sentence"
+          },
+          {
+            "text": "If your dependency array is missing a value, that closure stays frozen in time, reading snapshot values from the past.",
+            "start": 13.688,
+            "end": 21.6,
+            "startMs": 13688,
+            "endMs": 21600,
+            "type": "sentence"
+          },
+          {
+            "text": "You don't fix this by disabling ESLint warnings or blindly wrapping every function in useMemo.",
+            "start": 21.6,
+            "end": 27.763,
+            "startMs": 21600,
+            "endMs": 27763,
+            "type": "sentence"
+          },
+          {
+            "text": "You fix it by passing functional updates like setCount prev to prev plus 1 or syncing via custom hooks.",
+            "start": 27.762,
+            "end": 34.862,
+            "startMs": 27762,
+            "endMs": 34862,
+            "type": "sentence"
+          },
+          {
+            "text": "Respect the Fiber execution queue, keep your dependencies honest, and you will never debug a mystery render again.",
+            "start": 34.862,
+            "end": 42.1,
+            "startMs": 34862,
+            "endMs": 42100,
+            "type": "sentence"
+          }
+        ]
+      }
+    ],
+    "scenes": [
+      {
+        "id": "section_1_v0",
+        "type": "TitleScene",
+        "title": "React Hooks Mechanics",
+        "subtitle": "Why they work the way they do",
+        "narration": "For years, React developers suffered through lifecycle soup. You wrote setup logic in componentDidMount, duplicate teardown in componentWillUnmount, and synced prop changes inside componentDidUpdate. One logical feature was chopped into three distinct places, bound together by chaotic this bindings and wrapper hell. <break time='0.6s'/> React Hooks didn't just shorten your code — they completely revolutionized React by decoupling stateful logic from class lifecycles. Instead of grouping code by when it runs, hooks let you group code by what it actually does. But behind that clean functional syntax lies a persistent array structure in Fiber nodes that trips up almost every developer. Understanding this hidden mechanism is the exact difference between fighting stale renders and mastering React.",
+        "actualDurationSec": 0,
+        "estimatedDurationSec": 0,
+        "payload": {
+          "engine": "",
+          "inputs": {},
+          "layout": "orbital",
+          "code": "",
+          "language": "javascript",
+          "filename": "index.js",
+          "highlightLines": [],
+          "callout": "",
+          "nodes": [],
+          "connections": [],
+          "flowDescription": "",
+          "bulletPoints": [],
+          "badges": [
+            "Fiber Nodes",
+            "Call Order",
+            "Closures"
+          ],
+          "keyTakeaway": "Hooks aren't magic — they are linked lists attached to Fiber nodes",
+          "leftTitle": "",
+          "leftPoints": [],
+          "rightTitle": "",
+          "rightPoints": [],
+          "topicTag": "React",
+          "steps": [],
+          "stats": [],
+          "commands": [],
+          "termTitle": "Terminal",
+          "quote": "",
+          "author": "",
+          "context": "",
+          "diffLines": [],
+          "headers": [],
+          "rows": [],
+          "xLabels": [],
+          "series": [],
+          "yUnit": "",
+          "rootName": "",
+          "tree": [],
+          "chapterNumber": "",
+          "chapterTitle": "",
+          "description": "",
+          "actors": [],
+          "messages": [],
+          "query": "",
+          "videoUrl": ""
+        }
+      },
+      {
+        "id": "section_1_v1",
+        "type": "ComparisonScene",
+        "title": "Component Architecture",
+        "subtitle": "Classes vs Hooks",
+        "narration": "For years, React developers suffered through lifecycle soup. You wrote setup logic in componentDidMount, duplicate teardown in componentWillUnmount, and synced prop changes inside componentDidUpdate. One logical feature was chopped into three distinct places, bound together by chaotic this bindings and wrapper hell. <break time='0.6s'/> React Hooks didn't just shorten your code — they completely revolutionized React by decoupling stateful logic from class lifecycles. Instead of grouping code by when it runs, hooks let you group code by what it actually does. But behind that clean functional syntax lies a persistent array structure in Fiber nodes that trips up almost every developer. Understanding this hidden mechanism is the exact difference between fighting stale renders and mastering React.",
+        "actualDurationSec": 0,
+        "estimatedDurationSec": 0,
+        "payload": {
+          "engine": "",
+          "inputs": {},
+          "layout": "split",
+          "code": "",
+          "language": "javascript",
+          "filename": "index.js",
+          "highlightLines": [],
+          "callout": "",
+          "nodes": [],
+          "connections": [],
+          "flowDescription": "",
+          "bulletPoints": [],
+          "badges": [],
+          "keyTakeaway": "",
+          "leftTitle": "Class Lifecycle Model",
+          "leftPoints": [
+            "Code split by timing (mount/update/unmount)",
+            "Complex 'this' binding contexts",
+            "Wrapper hell from Higher-Order Components",
+            "Stateful logic tied strictly to class instance"
+          ],
+          "rightTitle": "Hooks Composition Model",
+          "rightPoints": [
+            "Code grouped by feature and concern",
+            "Pure function components without 'this'",
+            "Flat tree composition via custom hooks",
+            "State saved in Fiber linked lists"
+          ],
+          "topicTag": "",
+          "steps": [],
+          "stats": [],
+          "commands": [],
+          "termTitle": "Terminal",
+          "quote": "",
+          "author": "",
+          "context": "",
+          "diffLines": [],
+          "headers": [],
+          "rows": [],
+          "xLabels": [],
+          "series": [],
+          "yUnit": "",
+          "rootName": "",
+          "tree": [],
+          "chapterNumber": "",
+          "chapterTitle": "",
+          "description": "",
+          "actors": [],
+          "messages": [],
+          "query": "",
+          "videoUrl": ""
+        }
+      },
+      {
+        "id": "section_2_v0",
+        "type": "ArchitectureScene",
+        "title": "Inside Fiber: The Hook LinkedList",
+        "subtitle": "How React persists state across renders",
+        "narration": "Here is the core truth: React components are just JavaScript functions that re-run from scratch on every single render. So where does useState actually keep your data when the component function finishes executing? <break time='0.6s'/> React attaches a hidden linked list directly to your component's internal Fiber node in memory. Every single time a hook runs, React steps forward through that list using an internal index pointer. This is why the Rules of Hooks exist. When you call useState conditionally inside an if block, you shift the execution indices for every single hook that follows. React doesn't identify your state by variable names — it identifies state strictly by call order. Shift that order, and your state quietly cross-contaminates. Once you realize hooks rely on pointer offsets, early returns and conditional hooks suddenly make complete sense.",
+        "actualDurationSec": 0,
+        "estimatedDurationSec": 0,
+        "payload": {
+          "engine": "",
+          "inputs": {},
+          "layout": "flow",
+          "code": "",
+          "language": "javascript",
+          "filename": "index.js",
+          "highlightLines": [],
+          "callout": "",
+          "nodes": [
+            {
+              "id": "1",
+              "label": "React",
+              "icon": "code"
+            },
+            {
+              "id": "2",
+              "label": "Fiber Node",
+              "icon": "layers"
+            },
+            {
+              "id": "3",
+              "label": "Hook 0: useState",
+              "icon": "database"
+            },
+            {
+              "id": "4",
+              "label": "Hook 1: useEffect",
+              "icon": "refresh-cw"
+            },
+            {
+              "id": "5",
+              "label": "Hook 2: useRef",
+              "icon": "box"
+            }
+          ],
+          "connections": [
+            {
+              "from": "1",
+              "to": "2",
+              "label": "renders"
+            },
+            {
+              "from": "2",
+              "to": "3",
+              "label": "memoizedState"
+            },
+            {
+              "from": "3",
+              "to": "4",
+              "label": "next"
+            },
+            {
+              "from": "4",
+              "to": "5",
+              "label": "next"
+            }
+          ],
+          "flowDescription": "",
+          "bulletPoints": [],
+          "badges": [],
+          "keyTakeaway": "",
+          "leftTitle": "",
+          "leftPoints": [],
+          "rightTitle": "",
+          "rightPoints": [],
+          "topicTag": "",
+          "steps": [],
+          "stats": [],
+          "commands": [],
+          "termTitle": "Terminal",
+          "quote": "",
+          "author": "",
+          "context": "",
+          "diffLines": [],
+          "headers": [],
+          "rows": [],
+          "xLabels": [],
+          "series": [],
+          "yUnit": "",
+          "rootName": "",
+          "tree": [],
+          "chapterNumber": "",
+          "chapterTitle": "",
+          "description": "",
+          "actors": [],
+          "messages": [],
+          "query": "",
+          "videoUrl": ""
+        }
+      },
+      {
+        "id": "section_2_v1",
+        "type": "CodeEditorScene",
+        "title": "The Golden Rule of Hooks",
+        "subtitle": "Never call hooks inside conditions",
+        "narration": "Here is the core truth: React components are just JavaScript functions that re-run from scratch on every single render. So where does useState actually keep your data when the component function finishes executing? <break time='0.6s'/> React attaches a hidden linked list directly to your component's internal Fiber node in memory. Every single time a hook runs, React steps forward through that list using an internal index pointer. This is why the Rules of Hooks exist. When you call useState conditionally inside an if block, you shift the execution indices for every single hook that follows. React doesn't identify your state by variable names — it identifies state strictly by call order. Shift that order, and your state quietly cross-contaminates. Once you realize hooks rely on pointer offsets, early returns and conditional hooks suddenly make complete sense.",
+        "actualDurationSec": 0,
+        "estimatedDurationSec": 0,
+        "payload": {
+          "engine": "",
+          "inputs": {},
+          "layout": "fullscreen",
+          "code": "function UserProfile({ userId }) {\n  // ❌ BAD: Conditional hook breaks index order!\n  if (userId) {\n    const [user] = useState(null);\n  }\n  \n  // Fiber memoizedState pointer gets desynchronized!\n  const [theme] = useState('dark');\n}",
+          "language": "javascript",
+          "filename": "UserProfile.jsx",
+          "highlightLines": [
+            3,
+            4,
+            8
+          ],
+          "callout": "Hooks must run in the exact same sequence on every render!",
+          "nodes": [],
+          "connections": [],
+          "flowDescription": "",
+          "bulletPoints": [],
+          "badges": [],
+          "keyTakeaway": "",
+          "leftTitle": "",
+          "leftPoints": [],
+          "rightTitle": "",
+          "rightPoints": [],
+          "topicTag": "",
+          "steps": [],
+          "stats": [],
+          "commands": [],
+          "termTitle": "Terminal",
+          "quote": "",
+          "author": "",
+          "context": "",
+          "diffLines": [],
+          "headers": [],
+          "rows": [],
+          "xLabels": [],
+          "series": [],
+          "yUnit": "",
+          "rootName": "",
+          "tree": [],
+          "chapterNumber": "",
+          "chapterTitle": "",
+          "description": "",
+          "actors": [],
+          "messages": [],
+          "query": "",
+          "videoUrl": ""
+        }
+      },
+      {
+        "id": "section_3_v0",
+        "type": "CodeDiffScene",
+        "title": "Solving Stale Closures",
+        "subtitle": "Functional updates vs stale snapshot",
+        "narration": "This pointer-based memory model explains React's most frustrating bug: the stale closure. When a hook like useEffect or useCallback captures a variable, it closes over the exact value from that render pass. If your dependency array is missing a value, that closure stays frozen in time, reading snapshot values from the past. <break time='0.6s'/> You don't fix this by disabling ESLint warnings or blindly wrapping every function in useMemo. You fix it by passing functional updates like setCount prev to prev plus 1 or syncing via custom hooks. Respect the Fiber execution queue, keep your dependencies honest, and you will never debug a mystery render again.",
+        "actualDurationSec": 0,
+        "estimatedDurationSec": 0,
+        "payload": {
+          "engine": "",
+          "inputs": {},
+          "layout": "unified",
+          "code": "",
+          "language": "javascript",
+          "filename": "index.js",
+          "highlightLines": [],
+          "callout": "",
+          "nodes": [],
+          "connections": [],
+          "flowDescription": "",
+          "bulletPoints": [],
+          "badges": [],
+          "keyTakeaway": "",
+          "leftTitle": "",
+          "leftPoints": [],
+          "rightTitle": "",
+          "rightPoints": [],
+          "topicTag": "",
+          "steps": [],
+          "stats": [],
+          "commands": [],
+          "termTitle": "Terminal",
+          "quote": "",
+          "author": "",
+          "context": "",
+          "diffLines": [
+            {
+              "type": "context",
+              "text": "function Counter() {"
+            },
+            {
+              "type": "context",
+              "text": "  const [count, setCount] = useState(0);"
+            },
+            {
+              "type": "context",
+              "text": "  useEffect(() => {"
+            },
+            {
+              "type": "context",
+              "text": "    const timer = setInterval(() => {"
+            },
+            {
+              "type": "remove",
+              "text": "      setCount(count + 1); // Stale closure!"
+            },
+            {
+              "type": "add",
+              "text": "      setCount(prev => prev + 1); // Fresh value!"
+            },
+            {
+              "type": "context",
+              "text": "    }, 1000);"
+            },
+            {
+              "type": "context",
+              "text": "    return () => clearInterval(timer);"
+            },
+            {
+              "type": "remove",
+              "text": "  }, []); // count is trapped in initial closure"
+            },
+            {
+              "type": "add",
+              "text": "  }, []); // Safe without dependency"
+            },
+            {
+              "type": "context",
+              "text": "}"
+            }
+          ],
+          "headers": [],
+          "rows": [],
+          "xLabels": [],
+          "series": [],
+          "yUnit": "",
+          "rootName": "",
+          "tree": [],
+          "chapterNumber": "",
+          "chapterTitle": "",
+          "description": "",
+          "actors": [],
+          "messages": [],
+          "query": "",
+          "videoUrl": ""
+        }
+      },
+      {
+        "id": "section_3_v1",
+        "type": "SummaryScene",
+        "title": "Mastering React Hooks",
+        "subtitle": "Key takeaways for senior devs",
+        "narration": "This pointer-based memory model explains React's most frustrating bug: the stale closure. When a hook like useEffect or useCallback captures a variable, it closes over the exact value from that render pass. If your dependency array is missing a value, that closure stays frozen in time, reading snapshot values from the past. <break time='0.6s'/> You don't fix this by disabling ESLint warnings or blindly wrapping every function in useMemo. You fix it by passing functional updates like setCount prev to prev plus 1 or syncing via custom hooks. Respect the Fiber execution queue, keep your dependencies honest, and you will never debug a mystery render again.",
+        "actualDurationSec": 0,
+        "estimatedDurationSec": 0,
+        "payload": {
+          "engine": "",
+          "inputs": {},
+          "layout": "checklist",
+          "code": "",
+          "language": "javascript",
+          "filename": "index.js",
+          "highlightLines": [],
+          "callout": "",
+          "nodes": [],
+          "connections": [],
+          "flowDescription": "",
+          "bulletPoints": [
+            {
+              "title": "Linked List Memory",
+              "description": "Hooks store state sequentially on the Fiber node memoizedState pointer."
+            },
+            {
+              "title": "Unconditional Call Order",
+              "description": "Never wrap hooks in conditions or loops to protect array index alignment."
+            },
+            {
+              "title": "Snapshot Closures",
+              "description": "Use functional updates or explicit deps to prevent frozen, stale state values."
+            }
+          ],
+          "badges": [],
+          "keyTakeaway": "Hooks aren't magic — once you understand the Fiber queue, bugs disappear.",
+          "leftTitle": "",
+          "leftPoints": [],
+          "rightTitle": "",
+          "rightPoints": [],
+          "topicTag": "",
+          "steps": [],
+          "stats": [],
+          "commands": [],
+          "termTitle": "Terminal",
+          "quote": "",
+          "author": "",
+          "context": "",
+          "diffLines": [],
+          "headers": [],
+          "rows": [],
+          "xLabels": [],
+          "series": [],
+          "yUnit": "",
+          "rootName": "",
+          "tree": [],
+          "chapterNumber": "",
+          "chapterTitle": "",
+          "description": "",
+          "actors": [],
+          "messages": [],
+          "query": "",
+          "videoUrl": ""
+        }
+      }
+    ],
+    "createdAt": "2026-09-08T06:10:59.456Z",
+    "updatedAt": "2026-09-08T11:13:21.911Z"
+  },
+  "assets": [
+    {
+      "path": "job-36.assets/section-0.mp3",
+      "sha256": "3ad5eaa408f5d1b698432a10b8d6ad15d228ecbf2a1c19be2bef2516de2db819"
+    },
+    {
+      "path": "job-36.assets/section-1.mp3",
+      "sha256": "8dac9f9a9589becb66828b8692e39f9676a68742a96ba2769e3ed29d67dcdaca"
+    },
+    {
+      "path": "job-36.assets/section-2.mp3",
+      "sha256": "6c72c8c91b3e4fbd0910b666fef070c500ff64b941a9f8fdd2ec6cd8997b9b97"
+    }
+  ],
+  "diagnostics": [],
+  "baseline": true,
+  "historicalRendererSettings": "unknown; original output retained in public/output"
+}

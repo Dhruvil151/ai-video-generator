@@ -1,0 +1,1266 @@
+{
+  "manifestVersion": 1,
+  "createdAt": "2026-09-08T16:40:46.907Z",
+  "renderer": {
+    "fps": 30,
+    "width": 1920,
+    "height": 1080,
+    "frameFormat": "png",
+    "intermediateCrf": 1,
+    "finalCrf": 16
+  },
+  "script": {
+    "id": "script_1788885243067",
+    "schemaVersion": 2,
+    "brief": {
+      "audience": "Developer who knows basic programming",
+      "learningOutcome": "Understand how Elasticsearch uses an inverted index to perform instant full-text search compared to database scanning",
+      "scenario": "Searching through thousands of tech articles for query keywords like 'Docker' or 'deployment'"
+    },
+    "generation": {
+      "model": "gemini-3.6-flash",
+      "temperature": 0.9,
+      "topP": 0.95,
+      "promptVersion": "storyboard-v2.1"
+    },
+    "diagnostics": [],
+    "topic": "Elasticsearch Inverted Index",
+    "mode": "short",
+    "targetDurationMinutes": 3,
+    "estimatedTotalDurationSec": 135.9,
+    "actualTotalDurationSec": 148.53333333333333,
+    "voice": "en-US-ChristopherNeural",
+    "sections": [
+      {
+        "id": "section-1-problem",
+        "narration": "Imagine building a search feature for an engineering blog engine. When a user searches for 'Docker deployment', a traditional relational database uses a wildcard scan like LIKE percent Docker percent. This forces the database to read through every single article record from start to finish. As your blog grows from thousands to millions of documents, search latency degrades rapidly. While standard B-Tree indexes handle exact matches well, they cannot quickly search for individual words buried inside long text fields.",
+        "objective": "Explain the limitations of traditional database table scans for text search.",
+        "visuals": [
+          {
+            "id": "vis-sec1-title",
+            "type": "TitleScene",
+            "title": "Elasticsearch Inverted Index",
+            "subtitle": "How Full-Text Search Works Under the Hood",
+            "purpose": "Introduce the topic and set up the problem context",
+            "narrationAnchor": "Imagine building a search feature for an engineering blog engine.",
+            "continuityId": "",
+            "beats": [],
+            "durationFrames": 389,
+            "durationFraction": 0.4,
+            "startSec": 0,
+            "durationSec": 12.966666666666667,
+            "payload": {
+              "engine": "",
+              "inputs": {},
+              "layout": "default",
+              "code": "",
+              "language": "javascript",
+              "filename": "index.js",
+              "highlightLines": [],
+              "callout": "",
+              "nodes": [],
+              "connections": [],
+              "flowDescription": "",
+              "bulletPoints": [],
+              "badges": [
+                "Database",
+                "Search",
+                "Data Structures"
+              ],
+              "keyTakeaway": "Inverted indexes enable fast full-text search by mapping words to documents instead of documents to words.",
+              "leftTitle": "",
+              "leftPoints": [],
+              "rightTitle": "",
+              "rightPoints": [],
+              "topicTag": "Elasticsearch Architecture",
+              "steps": [],
+              "stats": [],
+              "commands": [],
+              "termTitle": "Terminal",
+              "quote": "",
+              "author": "",
+              "context": "",
+              "diffLines": [],
+              "headers": [],
+              "rows": [],
+              "xLabels": [],
+              "series": [],
+              "yUnit": "",
+              "rootName": "",
+              "tree": [],
+              "chapterNumber": "",
+              "chapterTitle": "",
+              "description": "",
+              "actors": [],
+              "messages": [],
+              "query": "",
+              "videoUrl": ""
+            },
+            "startFrame": 0,
+            "alignment": "section-start"
+          },
+          {
+            "id": "vis-sec1-scan",
+            "type": "ArchitectureScene",
+            "title": "Traditional Full Table Scan",
+            "subtitle": "O(N) linear inspection across unstructured text",
+            "purpose": "Demonstrate why SQL wildcard queries do not scale for text search",
+            "narrationAnchor": "This forces the database to read through every single article record from start to finish.",
+            "continuityId": "",
+            "beats": [],
+            "durationFrames": 632,
+            "durationFraction": 0.6,
+            "startSec": 12.966666666666667,
+            "durationSec": 21.066666666666666,
+            "payload": {
+              "engine": "",
+              "inputs": {},
+              "layout": "flow",
+              "code": "",
+              "language": "javascript",
+              "filename": "index.js",
+              "highlightLines": [],
+              "callout": "",
+              "nodes": [
+                {
+                  "id": "query",
+                  "label": "SQL: LIKE '%Docker%'",
+                  "icon": "code"
+                },
+                {
+                  "id": "doc1",
+                  "label": "Doc 1: Full Text Scan",
+                  "icon": "database"
+                },
+                {
+                  "id": "doc2",
+                  "label": "Doc 2: Full Text Scan",
+                  "icon": "database"
+                },
+                {
+                  "id": "doc3",
+                  "label": "Doc 3: Full Text Scan",
+                  "icon": "database"
+                }
+              ],
+              "connections": [
+                {
+                  "from": "query",
+                  "to": "doc1",
+                  "label": "Inspect Row"
+                },
+                {
+                  "from": "doc1",
+                  "to": "doc2",
+                  "label": "Next Row"
+                },
+                {
+                  "from": "doc2",
+                  "to": "doc3",
+                  "label": "Next Row"
+                }
+              ],
+              "flowDescription": "",
+              "bulletPoints": [],
+              "badges": [],
+              "keyTakeaway": "",
+              "leftTitle": "",
+              "leftPoints": [],
+              "rightTitle": "",
+              "rightPoints": [],
+              "topicTag": "",
+              "steps": [],
+              "stats": [],
+              "commands": [],
+              "termTitle": "Terminal",
+              "quote": "",
+              "author": "",
+              "context": "",
+              "diffLines": [],
+              "headers": [],
+              "rows": [],
+              "xLabels": [],
+              "series": [],
+              "yUnit": "",
+              "rootName": "",
+              "tree": [],
+              "chapterNumber": "",
+              "chapterTitle": "",
+              "description": "",
+              "actors": [],
+              "messages": [],
+              "query": "",
+              "videoUrl": ""
+            },
+            "startFrame": 389,
+            "alignment": "sentence"
+          }
+        ],
+        "audioPath": "job-39.assets/section-0.mp3",
+        "audioUrl": null,
+        "actualDurationSec": 34.032000000000004,
+        "estimatedDurationSec": 33.857142857142854,
+        "subtitles": [
+          {
+            "text": "Imagine building a search feature for an engineering blog engine.",
+            "start": 0.1,
+            "end": 4.4,
+            "startMs": 100,
+            "endMs": 4400,
+            "type": "sentence"
+          },
+          {
+            "text": "When a user searches for 'Docker deployment', a traditional relational database uses a wildcard scan like LIKE percent Docker percent.",
+            "start": 4.35,
+            "end": 12.975,
+            "startMs": 4350,
+            "endMs": 12975,
+            "type": "sentence"
+          },
+          {
+            "text": "This forces the database to read through every single article record from start to finish.",
+            "start": 12.975,
+            "end": 18.413,
+            "startMs": 12975,
+            "endMs": 18412,
+            "type": "sentence"
+          },
+          {
+            "text": "As your blog grows from thousands to millions of documents, search latency degrades rapidly.",
+            "start": 18.413,
+            "end": 24.488,
+            "startMs": 18412,
+            "endMs": 24488,
+            "type": "sentence"
+          },
+          {
+            "text": "While standard B-Tree indexes handle exact matches well, they cannot quickly search for individual words buried inside long text fields.",
+            "start": 24.488,
+            "end": 33.375,
+            "startMs": 24488,
+            "endMs": 33375,
+            "type": "sentence"
+          }
+        ],
+        "durationFrames": 1021,
+        "timelineDurationSec": 34.03333333333333,
+        "diagnostics": []
+      },
+      {
+        "id": "section-2-inverted-index",
+        "narration": "Elasticsearch solves this bottleneck by using an inverted index. When you index a document, an analysis pipeline breaks down the text. First, a tokenizer splits sentences into individual words. Next, lowercasing and stemmers normalize words like 'deployments' into 'deploy'. Finally, Elasticsearch constructs a dictionary of unique terms. Instead of document-to-text mapping, each term points to a posting list containing the IDs of all documents where that term occurs. Finding the word 'docker' no longer requires scanning document contents. Elasticsearch simply looks up 'docker' in the sorted dictionary and immediately retrieves the associated document IDs.",
+        "objective": "Detail how the text analysis pipeline builds the term dictionary and posting lists.",
+        "visuals": [
+          {
+            "id": "vis-sec2-pipeline",
+            "type": "StepsScene",
+            "title": "Text Analysis Pipeline",
+            "subtitle": "Converting raw text into clean searchable tokens",
+            "purpose": "Illustrate how raw strings are processed into standardized terms",
+            "narrationAnchor": "Elasticsearch solves this bottleneck by using an inverted index.",
+            "continuityId": "",
+            "beats": [],
+            "durationFrames": 760,
+            "durationFraction": 0.5,
+            "startSec": 0,
+            "durationSec": 25.333333333333332,
+            "payload": {
+              "engine": "",
+              "inputs": {},
+              "layout": "default",
+              "code": "",
+              "language": "javascript",
+              "filename": "index.js",
+              "highlightLines": [],
+              "callout": "",
+              "nodes": [],
+              "connections": [],
+              "flowDescription": "",
+              "bulletPoints": [],
+              "badges": [],
+              "keyTakeaway": "",
+              "leftTitle": "",
+              "leftPoints": [],
+              "rightTitle": "",
+              "rightPoints": [],
+              "topicTag": "",
+              "steps": [
+                {
+                  "label": "Tokenization",
+                  "description": "Splits text stream into discrete word tokens",
+                  "icon": "code"
+                },
+                {
+                  "label": "Normalization",
+                  "description": "Converts tokens to lowercase and strips punctuation",
+                  "icon": "layers"
+                },
+                {
+                  "label": "Stemming",
+                  "description": "Reduces word variants to base forms (deployments -> deploy)",
+                  "icon": "box"
+                }
+              ],
+              "stats": [],
+              "commands": [],
+              "termTitle": "Terminal",
+              "quote": "",
+              "author": "",
+              "context": "",
+              "diffLines": [],
+              "headers": [],
+              "rows": [],
+              "xLabels": [],
+              "series": [],
+              "yUnit": "",
+              "rootName": "",
+              "tree": [],
+              "chapterNumber": "",
+              "chapterTitle": "",
+              "description": "",
+              "actors": [],
+              "messages": [],
+              "query": "",
+              "videoUrl": ""
+            },
+            "startFrame": 0,
+            "alignment": "section-start"
+          },
+          {
+            "id": "vis-sec2-table",
+            "type": "ComparisonTableScene",
+            "title": "Forward Index vs. Inverted Index",
+            "subtitle": "Inverting the relationship between keys and terms",
+            "purpose": "Show the exact structure of an inverted index dictionary",
+            "narrationAnchor": "Instead of document-to-text mapping, each term points to a posting list",
+            "continuityId": "",
+            "beats": [],
+            "durationFrames": 637,
+            "durationFraction": 0.5,
+            "startSec": 25.333333333333332,
+            "durationSec": 21.233333333333334,
+            "payload": {
+              "engine": "",
+              "inputs": {},
+              "layout": "default",
+              "code": "",
+              "language": "javascript",
+              "filename": "index.js",
+              "highlightLines": [],
+              "callout": "",
+              "nodes": [],
+              "connections": [],
+              "flowDescription": "",
+              "bulletPoints": [],
+              "badges": [],
+              "keyTakeaway": "",
+              "leftTitle": "",
+              "leftPoints": [],
+              "rightTitle": "",
+              "rightPoints": [],
+              "topicTag": "",
+              "steps": [],
+              "stats": [],
+              "commands": [],
+              "termTitle": "Terminal",
+              "quote": "",
+              "author": "",
+              "context": "",
+              "diffLines": [],
+              "headers": [
+                "Forward Index (SQL)",
+                "Inverted Index (Elasticsearch)"
+              ],
+              "rows": [
+                {
+                  "feature": "Mapping Direction",
+                  "values": [
+                    "Doc ID -> Full Text Content",
+                    "Unique Term -> [Posting List of Doc IDs]"
+                  ]
+                },
+                {
+                  "feature": "Example Entry",
+                  "values": [
+                    "Doc 1 -> 'Docker in Production'",
+                    "'docker' -> [Doc 1, Doc 3]"
+                  ]
+                },
+                {
+                  "feature": "Query Execution",
+                  "values": [
+                    "Scans all text fields sequentially",
+                    "O(1) dictionary lookup returns Doc IDs"
+                  ]
+                }
+              ],
+              "xLabels": [],
+              "series": [],
+              "yUnit": "",
+              "rootName": "",
+              "tree": [],
+              "chapterNumber": "",
+              "chapterTitle": "",
+              "description": "",
+              "actors": [],
+              "messages": [],
+              "query": "",
+              "videoUrl": ""
+            },
+            "startFrame": 760,
+            "alignment": "sentence"
+          }
+        ],
+        "audioPath": "job-39.assets/section-1.mp3",
+        "audioUrl": null,
+        "actualDurationSec": 46.536,
+        "estimatedDurationSec": 40.285714285714285,
+        "subtitles": [
+          {
+            "text": "Elasticsearch solves this bottleneck by using an inverted index.",
+            "start": 0.1,
+            "end": 4.712,
+            "startMs": 100,
+            "endMs": 4712,
+            "type": "sentence"
+          },
+          {
+            "text": "When you index a document, an analysis pipeline breaks down the text.",
+            "start": 4.662,
+            "end": 9.688,
+            "startMs": 4662,
+            "endMs": 9688,
+            "type": "sentence"
+          },
+          {
+            "text": "First, a tokenizer splits sentences into individual words.",
+            "start": 9.688,
+            "end": 14.4,
+            "startMs": 9688,
+            "endMs": 14400,
+            "type": "sentence"
+          },
+          {
+            "text": "Next, lowercasing and stemmers normalize words like 'deployments' into 'deploy'.",
+            "start": 14.4,
+            "end": 20.337,
+            "startMs": 14400,
+            "endMs": 20338,
+            "type": "sentence"
+          },
+          {
+            "text": "Finally, Elasticsearch constructs a dictionary of unique terms.",
+            "start": 20.337,
+            "end": 25.325,
+            "startMs": 20338,
+            "endMs": 25325,
+            "type": "sentence"
+          },
+          {
+            "text": "Instead of document-to-text mapping, each term points to a posting list containing the IDs of all documents where that term occurs.",
+            "start": 25.325,
+            "end": 33.175,
+            "startMs": 25325,
+            "endMs": 33175,
+            "type": "sentence"
+          },
+          {
+            "text": "Finding the word 'docker' no longer requires scanning document contents.",
+            "start": 33.175,
+            "end": 38.2,
+            "startMs": 33175,
+            "endMs": 38200,
+            "type": "sentence"
+          },
+          {
+            "text": "Elasticsearch simply looks up 'docker' in the sorted dictionary and immediately retrieves the associated document IDs.",
+            "start": 38.2,
+            "end": 45.875,
+            "startMs": 38200,
+            "endMs": 45875,
+            "type": "sentence"
+          }
+        ],
+        "durationFrames": 1397,
+        "timelineDurationSec": 46.56666666666667,
+        "diagnostics": []
+      },
+      {
+        "id": "section-3-multi-word-search",
+        "narration": "When a query contains multiple words, Elasticsearch performs efficient set intersections. Searching for 'Docker deployment' fetches the posting lists for both terms and finds documents present in both lists. Beyond document IDs, the inverted index stores additional metadata, including term frequency and word positions. This allows scoring algorithms like BM25 to determine relevance. A document where 'Docker' appears five times in the title receives a higher ranking score than one where it appears once in the footer.",
+        "objective": "Show how posting lists evaluate multi-word queries and score relevancy.",
+        "visuals": [
+          {
+            "id": "vis-sec3-concept",
+            "type": "ConceptCardScene",
+            "title": "Set Operations & Relevancy Scoring",
+            "subtitle": "Fast intersections and BM25 ranking metadata",
+            "purpose": "Explain how multi-term searches and scoring operate efficiently",
+            "narrationAnchor": "When a query contains multiple words, Elasticsearch performs efficient set intersections.",
+            "continuityId": "",
+            "beats": [],
+            "durationFrames": 1060,
+            "durationFraction": 1,
+            "startSec": 0,
+            "durationSec": 35.333333333333336,
+            "payload": {
+              "engine": "",
+              "inputs": {},
+              "layout": "default",
+              "code": "",
+              "language": "javascript",
+              "filename": "index.js",
+              "highlightLines": [],
+              "callout": "",
+              "nodes": [],
+              "connections": [],
+              "flowDescription": "",
+              "bulletPoints": [
+                {
+                  "title": "Posting List Intersections",
+                  "description": "Merges arrays of document IDs using boolean operations (AND / OR) in linear time.",
+                  "icon": "layers"
+                },
+                {
+                  "title": "Term Frequency (TF)",
+                  "description": "Tracks how often a term occurs inside a document to calculate weight.",
+                  "icon": "box"
+                },
+                {
+                  "title": "Position Offsets",
+                  "description": "Stores exact token positions to enable phrase queries and proximity matching.",
+                  "icon": "clock"
+                }
+              ],
+              "badges": [],
+              "keyTakeaway": "Inverted indexes store positional and frequency metadata alongside Document IDs to compute BM25 scores rapidly.",
+              "leftTitle": "",
+              "leftPoints": [],
+              "rightTitle": "",
+              "rightPoints": [],
+              "topicTag": "",
+              "steps": [],
+              "stats": [],
+              "commands": [],
+              "termTitle": "Terminal",
+              "quote": "",
+              "author": "",
+              "context": "",
+              "diffLines": [],
+              "headers": [],
+              "rows": [],
+              "xLabels": [],
+              "series": [],
+              "yUnit": "",
+              "rootName": "",
+              "tree": [],
+              "chapterNumber": "",
+              "chapterTitle": "",
+              "description": "",
+              "actors": [],
+              "messages": [],
+              "query": "",
+              "videoUrl": ""
+            },
+            "startFrame": 0,
+            "alignment": "section-start"
+          }
+        ],
+        "audioPath": "job-39.assets/section-2.mp3",
+        "audioUrl": null,
+        "actualDurationSec": 35.304,
+        "estimatedDurationSec": 33,
+        "subtitles": [
+          {
+            "text": "When a query contains multiple words, Elasticsearch performs efficient set intersections.",
+            "start": 0.1,
+            "end": 6.188,
+            "startMs": 100,
+            "endMs": 6188,
+            "type": "sentence"
+          },
+          {
+            "text": "Searching for 'Docker deployment' fetches the posting lists for both terms and finds documents present in both lists.",
+            "start": 6.138,
+            "end": 13.713,
+            "startMs": 6138,
+            "endMs": 13712,
+            "type": "sentence"
+          },
+          {
+            "text": "Beyond document IDs, the inverted index stores additional metadata, including term frequency and word positions.",
+            "start": 13.713,
+            "end": 21.663,
+            "startMs": 13712,
+            "endMs": 21662,
+            "type": "sentence"
+          },
+          {
+            "text": "This allows scoring algorithms like BM25 to determine relevance.",
+            "start": 21.663,
+            "end": 26.963,
+            "startMs": 21662,
+            "endMs": 26963,
+            "type": "sentence"
+          },
+          {
+            "text": "A document where 'Docker' appears five times in the title receives a higher ranking score than one where it appears once in the footer.",
+            "start": 26.962,
+            "end": 34.65,
+            "startMs": 26962,
+            "endMs": 34650,
+            "type": "sentence"
+          }
+        ],
+        "durationFrames": 1060,
+        "timelineDurationSec": 35.333333333333336,
+        "diagnostics": []
+      },
+      {
+        "id": "section-4-limitations-summary",
+        "narration": "However, this query speed comes with distinct trade-offs. Constructing an inverted index consumes significant storage space and CPU during ingestion. Furthermore, underlying Lucene segment files are immutable. Updating a document requires writing a completely new document segment and marking the old entry as deleted. Therefore, Elasticsearch excels at read-heavy full-text search, but it should complement rather than replace a transactional database when dealing with high-volume, frequent writes.",
+        "objective": "Explain trade-offs, write overhead, and segment immutability.",
+        "visuals": [
+          {
+            "id": "vis-sec4-summary",
+            "type": "SummaryScene",
+            "title": "Inverted Index Architecture Summary",
+            "subtitle": "Balancing lightning-fast reads with write overhead",
+            "purpose": "Summarize key architectural trade-offs and best practices",
+            "narrationAnchor": "However, this query speed comes with distinct trade-offs.",
+            "continuityId": "",
+            "beats": [],
+            "durationFrames": 978,
+            "durationFraction": 1,
+            "startSec": 0,
+            "durationSec": 32.6,
+            "payload": {
+              "engine": "",
+              "inputs": {},
+              "layout": "default",
+              "code": "",
+              "language": "javascript",
+              "filename": "index.js",
+              "highlightLines": [],
+              "callout": "",
+              "nodes": [],
+              "connections": [],
+              "flowDescription": "",
+              "bulletPoints": [
+                {
+                  "title": "Sub-Second Reads",
+                  "description": "Dictionary lookups bypass full text scans for instant search results.",
+                  "icon": "cpu"
+                },
+                {
+                  "title": "Immutable Segments",
+                  "description": "Updates append new documents and mark old ones as deleted, triggering background merges.",
+                  "icon": "database"
+                },
+                {
+                  "title": "Storage & CPU Overhead",
+                  "description": "Index generation requires extra memory and storage space compared to raw databases.",
+                  "icon": "layers"
+                }
+              ],
+              "badges": [],
+              "keyTakeaway": "Use Elasticsearch for read-heavy text search alongside a relational database for high-frequency transactional updates.",
+              "leftTitle": "",
+              "leftPoints": [],
+              "rightTitle": "",
+              "rightPoints": [],
+              "topicTag": "",
+              "steps": [],
+              "stats": [],
+              "commands": [],
+              "termTitle": "Terminal",
+              "quote": "",
+              "author": "",
+              "context": "",
+              "diffLines": [],
+              "headers": [],
+              "rows": [],
+              "xLabels": [],
+              "series": [],
+              "yUnit": "",
+              "rootName": "",
+              "tree": [],
+              "chapterNumber": "",
+              "chapterTitle": "",
+              "description": "",
+              "actors": [],
+              "messages": [],
+              "query": "",
+              "videoUrl": ""
+            },
+            "startFrame": 0,
+            "alignment": "section-start"
+          }
+        ],
+        "audioPath": "job-39.assets/section-3.mp3",
+        "audioUrl": null,
+        "actualDurationSec": 32.568,
+        "estimatedDurationSec": 28.714285714285715,
+        "subtitles": [
+          {
+            "text": "However, this query speed comes with distinct trade-offs.",
+            "start": 0.1,
+            "end": 4.387,
+            "startMs": 100,
+            "endMs": 4387,
+            "type": "sentence"
+          },
+          {
+            "text": "Constructing an inverted index consumes significant storage space and CPU during ingestion.",
+            "start": 4.338,
+            "end": 10.588,
+            "startMs": 4338,
+            "endMs": 10588,
+            "type": "sentence"
+          },
+          {
+            "text": "Furthermore, underlying Lucene segment files are immutable.",
+            "start": 10.588,
+            "end": 14.938,
+            "startMs": 10588,
+            "endMs": 14938,
+            "type": "sentence"
+          },
+          {
+            "text": "Updating a document requires writing a completely new document segment and marking the old entry as deleted.",
+            "start": 14.938,
+            "end": 21.438,
+            "startMs": 14938,
+            "endMs": 21438,
+            "type": "sentence"
+          },
+          {
+            "text": "Therefore, Elasticsearch excels at read-heavy full-text search, but it should complement rather than replace a transactional database when dealing with high-volume, frequent writes.",
+            "start": 21.438,
+            "end": 31.913,
+            "startMs": 21438,
+            "endMs": 31912,
+            "type": "sentence"
+          }
+        ],
+        "durationFrames": 978,
+        "timelineDurationSec": 32.6,
+        "diagnostics": []
+      }
+    ],
+    "scenes": [
+      {
+        "id": "vis-sec1-title",
+        "type": "TitleScene",
+        "title": "Elasticsearch Inverted Index",
+        "subtitle": "How Full-Text Search Works Under the Hood",
+        "narration": "Imagine building a search feature for an engineering blog engine. When a user searches for 'Docker deployment', a traditional relational database uses a wildcard scan like LIKE percent Docker percent. This forces the database to read through every single article record from start to finish. As your blog grows from thousands to millions of documents, search latency degrades rapidly. While standard B-Tree indexes handle exact matches well, they cannot quickly search for individual words buried inside long text fields.",
+        "actualDurationSec": 12.966666666666667,
+        "estimatedDurationSec": 12.966666666666667,
+        "payload": {
+          "engine": "",
+          "inputs": {},
+          "layout": "default",
+          "code": "",
+          "language": "javascript",
+          "filename": "index.js",
+          "highlightLines": [],
+          "callout": "",
+          "nodes": [],
+          "connections": [],
+          "flowDescription": "",
+          "bulletPoints": [],
+          "badges": [
+            "Database",
+            "Search",
+            "Data Structures"
+          ],
+          "keyTakeaway": "Inverted indexes enable fast full-text search by mapping words to documents instead of documents to words.",
+          "leftTitle": "",
+          "leftPoints": [],
+          "rightTitle": "",
+          "rightPoints": [],
+          "topicTag": "Elasticsearch Architecture",
+          "steps": [],
+          "stats": [],
+          "commands": [],
+          "termTitle": "Terminal",
+          "quote": "",
+          "author": "",
+          "context": "",
+          "diffLines": [],
+          "headers": [],
+          "rows": [],
+          "xLabels": [],
+          "series": [],
+          "yUnit": "",
+          "rootName": "",
+          "tree": [],
+          "chapterNumber": "",
+          "chapterTitle": "",
+          "description": "",
+          "actors": [],
+          "messages": [],
+          "query": "",
+          "videoUrl": ""
+        }
+      },
+      {
+        "id": "vis-sec1-scan",
+        "type": "ArchitectureScene",
+        "title": "Traditional Full Table Scan",
+        "subtitle": "O(N) linear inspection across unstructured text",
+        "narration": "Imagine building a search feature for an engineering blog engine. When a user searches for 'Docker deployment', a traditional relational database uses a wildcard scan like LIKE percent Docker percent. This forces the database to read through every single article record from start to finish. As your blog grows from thousands to millions of documents, search latency degrades rapidly. While standard B-Tree indexes handle exact matches well, they cannot quickly search for individual words buried inside long text fields.",
+        "actualDurationSec": 21.066666666666666,
+        "estimatedDurationSec": 21.066666666666666,
+        "payload": {
+          "engine": "",
+          "inputs": {},
+          "layout": "flow",
+          "code": "",
+          "language": "javascript",
+          "filename": "index.js",
+          "highlightLines": [],
+          "callout": "",
+          "nodes": [
+            {
+              "id": "query",
+              "label": "SQL: LIKE '%Docker%'",
+              "icon": "code"
+            },
+            {
+              "id": "doc1",
+              "label": "Doc 1: Full Text Scan",
+              "icon": "database"
+            },
+            {
+              "id": "doc2",
+              "label": "Doc 2: Full Text Scan",
+              "icon": "database"
+            },
+            {
+              "id": "doc3",
+              "label": "Doc 3: Full Text Scan",
+              "icon": "database"
+            }
+          ],
+          "connections": [
+            {
+              "from": "query",
+              "to": "doc1",
+              "label": "Inspect Row"
+            },
+            {
+              "from": "doc1",
+              "to": "doc2",
+              "label": "Next Row"
+            },
+            {
+              "from": "doc2",
+              "to": "doc3",
+              "label": "Next Row"
+            }
+          ],
+          "flowDescription": "",
+          "bulletPoints": [],
+          "badges": [],
+          "keyTakeaway": "",
+          "leftTitle": "",
+          "leftPoints": [],
+          "rightTitle": "",
+          "rightPoints": [],
+          "topicTag": "",
+          "steps": [],
+          "stats": [],
+          "commands": [],
+          "termTitle": "Terminal",
+          "quote": "",
+          "author": "",
+          "context": "",
+          "diffLines": [],
+          "headers": [],
+          "rows": [],
+          "xLabels": [],
+          "series": [],
+          "yUnit": "",
+          "rootName": "",
+          "tree": [],
+          "chapterNumber": "",
+          "chapterTitle": "",
+          "description": "",
+          "actors": [],
+          "messages": [],
+          "query": "",
+          "videoUrl": ""
+        }
+      },
+      {
+        "id": "vis-sec2-pipeline",
+        "type": "StepsScene",
+        "title": "Text Analysis Pipeline",
+        "subtitle": "Converting raw text into clean searchable tokens",
+        "narration": "Elasticsearch solves this bottleneck by using an inverted index. When you index a document, an analysis pipeline breaks down the text. First, a tokenizer splits sentences into individual words. Next, lowercasing and stemmers normalize words like 'deployments' into 'deploy'. Finally, Elasticsearch constructs a dictionary of unique terms. Instead of document-to-text mapping, each term points to a posting list containing the IDs of all documents where that term occurs. Finding the word 'docker' no longer requires scanning document contents. Elasticsearch simply looks up 'docker' in the sorted dictionary and immediately retrieves the associated document IDs.",
+        "actualDurationSec": 25.333333333333332,
+        "estimatedDurationSec": 25.333333333333332,
+        "payload": {
+          "engine": "",
+          "inputs": {},
+          "layout": "default",
+          "code": "",
+          "language": "javascript",
+          "filename": "index.js",
+          "highlightLines": [],
+          "callout": "",
+          "nodes": [],
+          "connections": [],
+          "flowDescription": "",
+          "bulletPoints": [],
+          "badges": [],
+          "keyTakeaway": "",
+          "leftTitle": "",
+          "leftPoints": [],
+          "rightTitle": "",
+          "rightPoints": [],
+          "topicTag": "",
+          "steps": [
+            {
+              "label": "Tokenization",
+              "description": "Splits text stream into discrete word tokens",
+              "icon": "code"
+            },
+            {
+              "label": "Normalization",
+              "description": "Converts tokens to lowercase and strips punctuation",
+              "icon": "layers"
+            },
+            {
+              "label": "Stemming",
+              "description": "Reduces word variants to base forms (deployments -> deploy)",
+              "icon": "box"
+            }
+          ],
+          "stats": [],
+          "commands": [],
+          "termTitle": "Terminal",
+          "quote": "",
+          "author": "",
+          "context": "",
+          "diffLines": [],
+          "headers": [],
+          "rows": [],
+          "xLabels": [],
+          "series": [],
+          "yUnit": "",
+          "rootName": "",
+          "tree": [],
+          "chapterNumber": "",
+          "chapterTitle": "",
+          "description": "",
+          "actors": [],
+          "messages": [],
+          "query": "",
+          "videoUrl": ""
+        }
+      },
+      {
+        "id": "vis-sec2-table",
+        "type": "ComparisonTableScene",
+        "title": "Forward Index vs. Inverted Index",
+        "subtitle": "Inverting the relationship between keys and terms",
+        "narration": "Elasticsearch solves this bottleneck by using an inverted index. When you index a document, an analysis pipeline breaks down the text. First, a tokenizer splits sentences into individual words. Next, lowercasing and stemmers normalize words like 'deployments' into 'deploy'. Finally, Elasticsearch constructs a dictionary of unique terms. Instead of document-to-text mapping, each term points to a posting list containing the IDs of all documents where that term occurs. Finding the word 'docker' no longer requires scanning document contents. Elasticsearch simply looks up 'docker' in the sorted dictionary and immediately retrieves the associated document IDs.",
+        "actualDurationSec": 21.233333333333334,
+        "estimatedDurationSec": 21.233333333333334,
+        "payload": {
+          "engine": "",
+          "inputs": {},
+          "layout": "default",
+          "code": "",
+          "language": "javascript",
+          "filename": "index.js",
+          "highlightLines": [],
+          "callout": "",
+          "nodes": [],
+          "connections": [],
+          "flowDescription": "",
+          "bulletPoints": [],
+          "badges": [],
+          "keyTakeaway": "",
+          "leftTitle": "",
+          "leftPoints": [],
+          "rightTitle": "",
+          "rightPoints": [],
+          "topicTag": "",
+          "steps": [],
+          "stats": [],
+          "commands": [],
+          "termTitle": "Terminal",
+          "quote": "",
+          "author": "",
+          "context": "",
+          "diffLines": [],
+          "headers": [
+            "Forward Index (SQL)",
+            "Inverted Index (Elasticsearch)"
+          ],
+          "rows": [
+            {
+              "feature": "Mapping Direction",
+              "values": [
+                "Doc ID -> Full Text Content",
+                "Unique Term -> [Posting List of Doc IDs]"
+              ]
+            },
+            {
+              "feature": "Example Entry",
+              "values": [
+                "Doc 1 -> 'Docker in Production'",
+                "'docker' -> [Doc 1, Doc 3]"
+              ]
+            },
+            {
+              "feature": "Query Execution",
+              "values": [
+                "Scans all text fields sequentially",
+                "O(1) dictionary lookup returns Doc IDs"
+              ]
+            }
+          ],
+          "xLabels": [],
+          "series": [],
+          "yUnit": "",
+          "rootName": "",
+          "tree": [],
+          "chapterNumber": "",
+          "chapterTitle": "",
+          "description": "",
+          "actors": [],
+          "messages": [],
+          "query": "",
+          "videoUrl": ""
+        }
+      },
+      {
+        "id": "vis-sec3-concept",
+        "type": "ConceptCardScene",
+        "title": "Set Operations & Relevancy Scoring",
+        "subtitle": "Fast intersections and BM25 ranking metadata",
+        "narration": "When a query contains multiple words, Elasticsearch performs efficient set intersections. Searching for 'Docker deployment' fetches the posting lists for both terms and finds documents present in both lists. Beyond document IDs, the inverted index stores additional metadata, including term frequency and word positions. This allows scoring algorithms like BM25 to determine relevance. A document where 'Docker' appears five times in the title receives a higher ranking score than one where it appears once in the footer.",
+        "actualDurationSec": 35.333333333333336,
+        "estimatedDurationSec": 35.333333333333336,
+        "payload": {
+          "engine": "",
+          "inputs": {},
+          "layout": "default",
+          "code": "",
+          "language": "javascript",
+          "filename": "index.js",
+          "highlightLines": [],
+          "callout": "",
+          "nodes": [],
+          "connections": [],
+          "flowDescription": "",
+          "bulletPoints": [
+            {
+              "title": "Posting List Intersections",
+              "description": "Merges arrays of document IDs using boolean operations (AND / OR) in linear time.",
+              "icon": "layers"
+            },
+            {
+              "title": "Term Frequency (TF)",
+              "description": "Tracks how often a term occurs inside a document to calculate weight.",
+              "icon": "box"
+            },
+            {
+              "title": "Position Offsets",
+              "description": "Stores exact token positions to enable phrase queries and proximity matching.",
+              "icon": "clock"
+            }
+          ],
+          "badges": [],
+          "keyTakeaway": "Inverted indexes store positional and frequency metadata alongside Document IDs to compute BM25 scores rapidly.",
+          "leftTitle": "",
+          "leftPoints": [],
+          "rightTitle": "",
+          "rightPoints": [],
+          "topicTag": "",
+          "steps": [],
+          "stats": [],
+          "commands": [],
+          "termTitle": "Terminal",
+          "quote": "",
+          "author": "",
+          "context": "",
+          "diffLines": [],
+          "headers": [],
+          "rows": [],
+          "xLabels": [],
+          "series": [],
+          "yUnit": "",
+          "rootName": "",
+          "tree": [],
+          "chapterNumber": "",
+          "chapterTitle": "",
+          "description": "",
+          "actors": [],
+          "messages": [],
+          "query": "",
+          "videoUrl": ""
+        }
+      },
+      {
+        "id": "vis-sec4-summary",
+        "type": "SummaryScene",
+        "title": "Inverted Index Architecture Summary",
+        "subtitle": "Balancing lightning-fast reads with write overhead",
+        "narration": "However, this query speed comes with distinct trade-offs. Constructing an inverted index consumes significant storage space and CPU during ingestion. Furthermore, underlying Lucene segment files are immutable. Updating a document requires writing a completely new document segment and marking the old entry as deleted. Therefore, Elasticsearch excels at read-heavy full-text search, but it should complement rather than replace a transactional database when dealing with high-volume, frequent writes.",
+        "actualDurationSec": 32.6,
+        "estimatedDurationSec": 32.6,
+        "payload": {
+          "engine": "",
+          "inputs": {},
+          "layout": "default",
+          "code": "",
+          "language": "javascript",
+          "filename": "index.js",
+          "highlightLines": [],
+          "callout": "",
+          "nodes": [],
+          "connections": [],
+          "flowDescription": "",
+          "bulletPoints": [
+            {
+              "title": "Sub-Second Reads",
+              "description": "Dictionary lookups bypass full text scans for instant search results.",
+              "icon": "cpu"
+            },
+            {
+              "title": "Immutable Segments",
+              "description": "Updates append new documents and mark old ones as deleted, triggering background merges.",
+              "icon": "database"
+            },
+            {
+              "title": "Storage & CPU Overhead",
+              "description": "Index generation requires extra memory and storage space compared to raw databases.",
+              "icon": "layers"
+            }
+          ],
+          "badges": [],
+          "keyTakeaway": "Use Elasticsearch for read-heavy text search alongside a relational database for high-frequency transactional updates.",
+          "leftTitle": "",
+          "leftPoints": [],
+          "rightTitle": "",
+          "rightPoints": [],
+          "topicTag": "",
+          "steps": [],
+          "stats": [],
+          "commands": [],
+          "termTitle": "Terminal",
+          "quote": "",
+          "author": "",
+          "context": "",
+          "diffLines": [],
+          "headers": [],
+          "rows": [],
+          "xLabels": [],
+          "series": [],
+          "yUnit": "",
+          "rootName": "",
+          "tree": [],
+          "chapterNumber": "",
+          "chapterTitle": "",
+          "description": "",
+          "actors": [],
+          "messages": [],
+          "query": "",
+          "videoUrl": ""
+        }
+      }
+    ],
+    "createdAt": "2026-09-08T16:34:03.067Z",
+    "updatedAt": "2026-09-08T16:34:03.126Z"
+  },
+  "assets": [
+    {
+      "path": "job-39.assets/section-0.mp3",
+      "sha256": "dcd55feb06e4ea33685f229f700fd8772bcf096027b8137ca40086fba7965855"
+    },
+    {
+      "path": "job-39.assets/section-1.mp3",
+      "sha256": "c289dfe9ab7f284ce8b0bc260d71653c682a7ff6c325d6e3e52ae0f834de8f52"
+    },
+    {
+      "path": "job-39.assets/section-2.mp3",
+      "sha256": "b3bb789b4de27693d29ec17b2044ab4f8bdb1fdbb5a07a909f2e1948cea69b55"
+    },
+    {
+      "path": "job-39.assets/section-3.mp3",
+      "sha256": "48429bed2b053e72ed9e371b8a539aa6455a6585dad4c670658b003c24e88d20"
+    }
+  ],
+  "sourceHashes": {
+    "package-lock.json": "f98ed242b2581c4821de6eb9e64717d38f2f0ab87171ec89743986ece2a895c2",
+    "assets/asset-registry.json": "1d5b04ac81f407cbc1a825287d041b934f06a9933c9ff6e7dbc630796d42d044",
+    "src/remotion/EducationalVideo.tsx": "05f3e9a95516cdc2de54bf918d6df2bbeec9347b93a12772d94d6a06e2043f8c",
+    "src/remotion/index.ts": "8ad7cfb50e32546485a1a2ef5e468e5b6bdee2bc5c9b92d08882f96e3750b4a3",
+    "src/remotion/Root.tsx": "45d93601c788b794e8d449851981d06dc016293933984dd17ca66adfc3ab005e",
+    "src/remotion/components/ArchitectureScene.tsx": "7385892474d5d498b9c4cb497e3af3cfc3baa3a13534a8e950e3cd5118c41ca5",
+    "src/remotion/components/AudioMixer.tsx": "cc3f9bf7d1b5a4965efb14594395b857d91a2c79984f2f45da482d021dc9b8e1",
+    "src/remotion/components/BackgroundGradients.tsx": "d2f8570acf6a0b6cceecfb92058c120a4dae9353b45ba61e0ac2b3ff00df6e6d",
+    "src/remotion/components/ChapterScene.tsx": "01cfa64930a13eca4c3d85c8573db5bfeda7c65a7299f2aa6a790eded18677e0",
+    "src/remotion/components/CodeDiffScene.tsx": "132ab019d676977d04edeaafc06de8346483df31254d23ba09fb1548943bec18",
+    "src/remotion/components/CodeEditorScene.tsx": "8366f46e1ea931b7424549a0d1461a41e6df1495383e5acab75d7705e6e3fef6",
+    "src/remotion/components/ComparisonScene.tsx": "606147a0eb4bd24438873b9a68f231e500e238ee1490385e6280f44887d5e0bf",
+    "src/remotion/components/ComparisonTableScene.tsx": "3f3754ded9deb14f1189fa66bae63b0d3fb338672f24a9069597a71fcdfd7e71",
+    "src/remotion/components/ConceptCardScene.tsx": "49086d759717a33078d5a5179142059a591fcd0a9d3303bb2fd510cca89b1bd1",
+    "src/remotion/components/FileTreeScene.tsx": "da8b0b8c764143087524c226ec3b1bad26c619be81ce4d2fe99d406a0554f47d",
+    "src/remotion/components/LineChartScene.tsx": "80ef7f6181bf33c1623346589c3d971b4a6a94862d154507bddbfe225d214386",
+    "src/remotion/components/MechanismScene.tsx": "34197cef69bef4407dbd9680f70015e68b6f9ab1121018b9e51dd4225db376e6",
+    "src/remotion/components/QualityProbe.tsx": "29d3e499e2327f33343956fcc38e19c73c8cb0042a6e2ffa448969a77f3d7fc6",
+    "src/remotion/components/QuoteScene.tsx": "fd66cb801bce6cffe01525ebf5f7713e1a5ca5768708d6c837d0849cacb501d9",
+    "src/remotion/components/SequenceDiagramScene.tsx": "93c8c0c04c9e62d7557aaa6679a78c7dcbf27c008c83193d0d7d49046a6b6f16",
+    "src/remotion/components/StatsScene.tsx": "7fff3d92051ff04fed88df43e1e98970c758a362d2f5e823eb99f1bb772d0085",
+    "src/remotion/components/StepsScene.tsx": "38912d78733a557d5cb8d63a49126be1c735cc0a278b98d205c2f546c84b7ba9",
+    "src/remotion/components/StockVideoScene.tsx": "760475ddc9f6cb0c0189db087b24455e14c32a683b8b746d31e5a3abac1efbbe",
+    "src/remotion/components/SubtitlesOverlay.tsx": "3826f54d421186afbb4834dee708b54ce2448540a515a4486fe4c32ca06c25e4",
+    "src/remotion/components/SummaryScene.tsx": "b0a8dd875d757d5606b4aba9d7d28cb38fbcd43b7dc5b01b3558bbc1d022f1f1",
+    "src/remotion/components/SvgIcons.tsx": "d18d08563a6a2071980b6ccbfae0fd1a4fbe1c4d4b62128a8ee4d3f0797ffb7c",
+    "src/remotion/components/TechLogos.tsx": "29e2898a7a63bc715c225d776bb2b64dc8f7a51b9450bef48598ca1e4bba0dd9",
+    "src/remotion/components/TerminalScene.tsx": "d7aac7ee0cb07545cfd0f9217bb03f54d7d43b8cee2947a8b6e45dec84d34394",
+    "src/remotion/components/TimelineScene.tsx": "7777d007d28712eaf6b3cafa4e496c87731fcd7edab761092acaa13ccd8c3878",
+    "src/remotion/components/TitleScene.tsx": "78551bba4bf86ff1c109f6e0a72dc1aefee4cd98ee783cdc169fcd21bf31ba5b",
+    "src/remotion/fonts/inter-400.woff2": "8909904ab6c872eb994093482a88a28eca2cd95912d7b6fecd72103b0dc07edc",
+    "src/remotion/fonts/inter-500.woff2": "f3779f1efccc4bdcdf9c0a02ab95bf6bd092ed09c48c08cedc725889edd1d19f",
+    "src/remotion/fonts/inter-600.woff2": "f9a06e79cd3a2a20951c0f0e28f66dd0e6d3fda73911d640a2125c8fcb78f21a",
+    "src/remotion/fonts/inter-700.woff2": "6f56409fd3d64bb85f7d070bce20749db2d66b6d63cec586cc22d1c761be2491",
+    "src/remotion/fonts/jetbrainsmono-400.woff2": "14425ba9c695763c1547f48a206b7aa60350a33ae23de09f0407877f3fcd89eb",
+    "src/remotion/fonts/jetbrainsmono-600.woff2": "400c6bfda18d5d14acad1c15d6dcb9f8e13c015e7286317e0b9a482539bef147",
+    "src/remotion/fonts/outfit-600.woff2": "8cfe15c2c6de6ef8efff3eedbd52a383ac9ef23d6c23f6cd9f9b838f5f37dc36",
+    "src/remotion/fonts/outfit-700.woff2": "5d5e3734089a74707292ce8a3e186def34cd63e33879f9ac3689a8d8da9d0706",
+    "src/remotion/fonts/outfit-900.woff2": "090bdae2e8f2fdc962732c8f918d57c5501737c6826be989bcd770860ec19f85",
+    "src/remotion/styles/video.css": "9b85c09222e6c69382524063f8c7e4f97659acaebbbac13787f7b0fa4b09ee60",
+    "src/remotion/utils/getTechTheme.ts": "ec7226b3b4e72e7ab6f1a0e01ef91aaa2db4b3ea929c86e6adb64da261405948",
+    "shared/demonstrations.mjs": "24866789630048669c5f9e99930c9c0f9ef42d4affc2f2943c4f76a9931c84c8",
+    "shared/timeline.mjs": "ba9c1b1390cddf51764fd45d8aac076926991346d08bafee083e0a70909beecf"
+  },
+  "diagnostics": [],
+  "warnings": [
+    {
+      "code": "estimated-caption-segmentation",
+      "message": "Sentence timing subdivided approximately for section-1-problem"
+    },
+    {
+      "code": "estimated-caption-segmentation",
+      "message": "Sentence timing subdivided approximately for section-2-inverted-index"
+    },
+    {
+      "code": "estimated-caption-segmentation",
+      "message": "Sentence timing subdivided approximately for section-3-multi-word-search"
+    },
+    {
+      "code": "estimated-caption-segmentation",
+      "message": "Sentence timing subdivided approximately for section-4-limitations-summary"
+    }
+  ],
+  "captionsAvailable": true,
+  "sourceManifestSha256": "f9d666f18130ff6fe83fef17c3bd38d2c09da3a95fa975b90735d2479f75cab0"
+}

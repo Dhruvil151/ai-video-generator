@@ -13,6 +13,7 @@ import { promisify } from 'util';
 import fs from 'fs';
 import path from 'path';
 import ffmpegPath from 'ffmpeg-static';
+import ffprobe from 'ffprobe-static';
 
 const execFileAsync = promisify(execFile);
 
@@ -87,6 +88,27 @@ export async function concatenateScenes(scenePaths, outputPath) {
  * @param {Array<{videoPath: string, audioPath: string, audioStartSec: number, durationSec: number}>} scenes
  * @param {string} outputPath - final stitched MP4 (video + TTS audio, no bg music yet)
  */
+export async function stitchSections(scenePaths, sections, outputPath) {
+  const videoPath = outputPath + '.video.mp4';
+  await concatenateScenes(scenePaths, videoPath);
+  const inputs = ['-i', videoPath];
+  const filters = [];
+  sections.forEach((section, i) => {
+    if (!section.audioPath) throw new Error(`Missing audio for ${section.id}`);
+    inputs.push('-i', section.audioPath);
+    const seconds = section.timelineDurationSec;
+    if (!Number.isFinite(seconds) || seconds <= 0) throw new Error('Missing compiled section timing');
+    filters.push(`[${i+1}:a]aresample=48000,apad,atrim=duration=${seconds.toFixed(9)},asetpts=PTS-STARTPTS[a${i}]`);
+  });
+  filters.push(`${sections.map((_,i)=>`[a${i}]`).join('')}concat=n=${sections.length}:v=0:a=1[audio]`);
+  try {
+    await ffmpeg('-y', ...inputs, '-filter_complex', filters.join(';'), '-map', '0:v', '-map', '[audio]',
+      '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-ar', '48000', outputPath);
+  } finally {
+    if (fs.existsSync(videoPath)) fs.unlinkSync(videoPath);
+  }
+}
+
 export async function stitchScenesWithAudio(scenes, outputPath) {
   if (scenes.length === 0) throw new Error('No scenes provided to stitch');
 
@@ -178,10 +200,10 @@ export async function mixBackgroundMusic({
    * Uses the `sidechaincompress` filter (available in ffmpeg 4.x+).
    */
   const duckFilter = [
-    '[0:a]aformat=sample_rates=48000:channel_layouts=stereo[voice]',
+    '[0:a]aformat=sample_rates=48000:channel_layouts=stereo,asplit=2[voice][sidechain]',
     `[1:a]aloop=loop=-1:size=2e+09,aformat=sample_rates=48000:channel_layouts=stereo,volume=${ambientVol}[bgraw]`,
     // Sidechain: use voice as key, compress bg music
-    `[bgraw][voice]sidechaincompress=threshold=0.01:ratio=20:attack=200:release=1000:level_sc=0.8[bgduck]`,
+    `[bgraw][sidechain]sidechaincompress=threshold=0.01:ratio=20:attack=200:release=1000:level_sc=0.8[bgduck]`,
     // Mix voice + ducked bg
     `[voice][bgduck]amix=inputs=2:duration=first:weights=1 1[aout]`,
   ].join(';');
@@ -196,7 +218,7 @@ export async function mixBackgroundMusic({
     '-c:v', 'copy',
     '-c:a', 'aac',
     '-b:a', '192k',
-    '-shortest',
+    '-t', String(await getVideoDuration(videoPath)),
     outputPath
   );
 
@@ -277,7 +299,9 @@ export function generateSrtFile(sections, outputSrtPath) {
   let cumulativeSec = 0;
 
   for (const section of sections) {
-    const all       = section.subtitles || [];
+    const sectionDuration = section.timelineDurationSec || section.actualDurationSec || section.estimatedDurationSec || 0;
+    const all = (section.subtitles || []).filter(c => Number.isFinite(c.start) && Number.isFinite(c.end))
+      .map(c => ({...c,start:Math.max(0,c.start),end:Math.min(sectionDuration,c.end)})).filter(c=>c.end>c.start);
     const wordLevel = all.filter(w => !w.type);   // WordBoundary — individual words
     const sentLevel = all.filter(w => w.type === 'sentence'); // SentenceBoundary — full sentences
 
@@ -292,18 +316,25 @@ export function generateSrtFile(sections, outputSrtPath) {
     } else if (sentLevel.length > 0) {
       // Fallback: Edge TTS only fired SentenceBoundary events — use full sentences as cues
       for (const sent of sentLevel) {
-        entries.push({
-          startSec: Math.max(0, cumulativeSec + sent.start),
-          endSec:   cumulativeSec + sent.end,
-          text:     sent.text,
-        });
+        const words=String(sent.text).split(/\s+/).filter(Boolean);
+        for(let i=0;i<words.length;i+=WORDS_PER_LINE){
+          const end=Math.min(words.length,i+WORDS_PER_LINE);
+          entries.push({startSec:cumulativeSec+sent.start+(sent.end-sent.start)*i/words.length,
+            endSec:cumulativeSec+sent.start+(sent.end-sent.start)*end/words.length,text:words.slice(i,end).join(' ')});
+        }
       }
     }
 
-    cumulativeSec += section.actualDurationSec || section.estimatedDurationSec || 0;
+    cumulativeSec += section.timelineDurationSec || section.actualDurationSec || section.estimatedDurationSec || 0;
   }
 
-  const srt = entries.map((e, i) => (
+  const ordered = entries.filter(e => Number.isFinite(e.startSec) && Number.isFinite(e.endSec) && e.text?.trim())
+    .sort((a, b) => a.startSec - b.startSec);
+  const valid = ordered.map((e, i) => ({
+    ...e, endSec: Math.min(e.endSec, ordered[i + 1]?.startSec ?? e.endSec),
+  })).filter(e => Math.round(e.endSec * 1000) > Math.round(e.startSec * 1000));
+  if (!valid.length) throw new Error('No usable subtitle timestamps; caption output was not created');
+  const srt = valid.map((e, i) => (
     `${i + 1}\n${srtTimestamp(e.startSec)} --> ${srtTimestamp(e.endSec)}\n${e.text}`
   )).join('\n\n');
 
@@ -311,11 +342,12 @@ export function generateSrtFile(sections, outputSrtPath) {
   console.log(`[FFmpeg] SRT written: ${path.basename(outputSrtPath)} (${entries.length} cues)`);
 }
 
-function srtTimestamp(secs) {
-  const h  = Math.floor(secs / 3600);
-  const m  = Math.floor((secs % 3600) / 60);
-  const s  = Math.floor(secs % 60);
-  const ms = Math.round((secs % 1) * 1000);
+export function srtTimestamp(secs) {
+  const totalMs = Math.max(0, Math.round(secs * 1000));
+  const h  = Math.floor(totalMs / 3600000);
+  const m  = Math.floor(totalMs / 60000) % 60;
+  const s  = Math.floor(totalMs / 1000) % 60;
+  const ms = totalMs % 1000;
   return `${zp(h)}:${zp(m)}:${zp(s)},${zp(ms, 3)}`;
 }
 
@@ -323,20 +355,17 @@ function zp(n, len = 2) { return String(n).padStart(len, '0'); }
 
 /**
  * Get video duration in seconds.
- * FFmpeg always writes Duration to stderr, not stdout.
+ * Probe container metadata without decoding the entire video.
  * @param {string} filePath
  * @returns {Promise<number>}
  */
 export async function getVideoDuration(filePath) {
-  try {
-    await execFileAsync(ffmpegPath, ['-i', filePath, '-f', 'null', '-'], {
-      maxBuffer: 10 * 1024 * 1024,
-    });
-  } catch (err) {
-    // ffmpeg always exits non-zero for -f null — Duration is on stderr
-    const output = (err.stderr ? err.stderr.toString() : '') + (err.stdout ? err.stdout.toString() : '');
-    const m = output.match(/Duration: (\d+):(\d+):(\d+\.\d+)/);
-    if (m) return parseInt(m[1]) * 3600 + parseInt(m[2]) * 60 + parseFloat(m[3]);
+  const { stdout } = await execFileAsync(ffprobe.path, [
+    '-v', 'error', '-show_entries', 'format=duration', '-of', 'json', filePath,
+  ], { timeout: 30000, maxBuffer: 1024 * 1024 });
+  const duration = Number(JSON.parse(stdout).format?.duration);
+  if (!Number.isFinite(duration) || duration <= 0) {
+    throw new Error(`Invalid media duration: ${filePath}`);
   }
-  return 0;
+  return duration;
 }

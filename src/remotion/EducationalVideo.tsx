@@ -18,8 +18,29 @@ import { FileTreeScene }     from './components/FileTreeScene';
 import { ChapterScene }      from './components/ChapterScene';
 import { SequenceDiagramScene } from './components/SequenceDiagramScene';
 import { StockVideoScene }  from './components/StockVideoScene';
+import { MechanismScene } from './components/MechanismScene';
+import { sceneTimings as compileTimings } from '../../shared/timeline.mjs';
+import { QualityProbe } from './components/QualityProbe';
 import { getTechTheme } from './utils/getTechTheme';
 import './styles/video.css';
+
+// Worked-example registry (schema v3, server/models/Script.js) — visuals reference an
+// entry by exampleId + operationRange instead of copying its data. No scene component
+// reads this yet (Phase 4); it's plumbed through so the data is available once one does.
+export interface ExampleCorpusEntry { id: string; fields?: Record<string, unknown>; }
+export interface ExampleOperation   { id: string; label: string; args?: Record<string, unknown>; }
+export interface ExampleEvidence    { sourceId: string; claim: string; provenance: 'computed-locally'|'external-fixture'|'illustrative'; verificationStatus: 'unverified'|'verified'; }
+export interface WorkedExample {
+  id: string;
+  scenario: string;
+  assumptions: string;
+  corpus: ExampleCorpusEntry[];
+  operations: ExampleOperation[];
+  evidence: ExampleEvidence[];
+  inputData: Record<string, unknown>;
+  query: Record<string, unknown>;
+}
+export interface OperationRange { from: number; to: number; }
 
 export interface VideoScene {
   id: string;
@@ -33,12 +54,20 @@ export interface VideoScene {
   estimatedDurationSec?: number;
   subtitles?: any[];
   payload?: Record<string, any>;
+  durationFrames?: number;
+  beats?: Array<{frame:number; step?:number; narrationAnchor?:string}>;
+  continuityId?: string;
+  exampleId?: string | null;
+  operationRange?: OperationRange | null;
+  operationMode?: 'execute' | 'inspect';
 }
 
 export interface EducationalVideoProps {
   scenes: VideoScene[];
+  examples?: WorkedExample[];
   bgMusicUrl?: string | null;
   topic?: string;
+  reviewMode?: boolean;
 }
 
 const SCENE_COMPONENTS: Record<string, React.ComponentType<any>> = {
@@ -60,6 +89,7 @@ const SCENE_COMPONENTS: Record<string, React.ComponentType<any>> = {
   ChapterScene,
   SequenceDiagramScene,
   StockVideoScene,
+  MechanismScene,
 };
 
 const FADE_FRAMES = 10;
@@ -67,7 +97,7 @@ const FADE_FRAMES = 10;
 const SceneTransition: React.FC<{ durationFrames: number; isFirst: boolean; isLast: boolean; children: React.ReactNode }> = ({ durationFrames, isFirst, isLast, children }) => {
   const frame = useCurrentFrame();
   const fadeIn = isFirst ? 1 : interpolate(frame, [0, FADE_FRAMES], [0, 1], { extrapolateRight: 'clamp' });
-  const fadeOut = isLast ? 1 : interpolate(frame, [durationFrames - FADE_FRAMES, durationFrames], [1, 0], { extrapolateRight: 'clamp' });
+  const fadeOut = isLast ? 1 : interpolate(frame, [durationFrames - FADE_FRAMES, durationFrames], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
   return (
     <AbsoluteFill style={{ opacity: fadeIn * fadeOut }}>
       {children}
@@ -75,28 +105,23 @@ const SceneTransition: React.FC<{ durationFrames: number; isFirst: boolean; isLa
   );
 };
 
-export const EducationalVideo: React.FC<EducationalVideoProps> = ({ scenes, bgMusicUrl, topic }) => {
+export const EducationalVideo: React.FC<EducationalVideoProps> = ({ scenes, examples, bgMusicUrl, topic, reviewMode }) => {
   const { fps } = useVideoConfig();
   const techTheme = getTechTheme(topic || '');
 
-  let cumulativeFrames = 0;
-  const sceneTimings = scenes.map(scene => {
-    const durationSec = scene.actualDurationSec || scene.estimatedDurationSec || 10;
-    const durationFrames = Math.ceil(durationSec * fps);
-    const from = cumulativeFrames;
-    cumulativeFrames += durationFrames;
-    return { scene, from, durationFrames };
-  });
+  const sceneTimings = compileTimings(scenes, fps);
 
   return (
     <AbsoluteFill>
+      {reviewMode && <QualityProbe/>}
       {sceneTimings.map(({ scene, from, durationFrames }, index) => {
         const SceneComponent = SCENE_COMPONENTS[scene.type] || ConceptCardScene;
         return (
           <Sequence key={scene.id} from={from} durationInFrames={durationFrames}>
-            <SceneTransition durationFrames={durationFrames} isFirst={index === 0} isLast={index === sceneTimings.length - 1}>
+            <SceneTransition durationFrames={durationFrames} isFirst={true} isLast={true}>
               <SceneComponent
                 scene={scene}
+                examples={examples ?? []}
                 bgMusicUrl={bgMusicUrl ?? null}
                 techPrimary={techTheme.primary}
                 techSecondary={techTheme.secondary}

@@ -1,12 +1,30 @@
 import { GeminiService } from '../services/geminiService.js';
 import { VIDEO_MODES } from '../config/constants.js';
 import { formatDuration } from '../utils/durationCalculator.js';
+import { ScriptModel, normalizeExample } from '../models/Script.js';
+import { validateStoryboard } from '../services/storyboardValidation.js';
+import { reconcileDerivedState } from '../services/scriptReconciliation.js';
+import { executeOperations } from '../../shared/operations.mjs';
 
 // In-memory script store (Phase 5 will persist to Redis)
 export const scriptStore = new Map();
 
 
 export class ScriptController {
+  static save(req, res) {
+    try {
+      const script = new ScriptModel(req.body);
+      // Reconciles against whatever is currently stored under this ID — the only real
+      // editing UI is a whole-JSON textarea, so save() must invalidate stale dependents
+      // exactly like a PATCH would, not trust whatever derived fields were submitted.
+      reconcileDerivedState(script, scriptStore.get(script.id) || null);
+      const warnings = validateStoryboard(script);
+      scriptStore.set(script.id, script);
+      return res.json({...script.toJSON(), warnings});
+    } catch (error) {
+      return res.status(400).json({error:error.message});
+    }
+  }
   /**
    * POST /api/script/estimate
    * Body: { topic, mode }
@@ -107,10 +125,11 @@ export class ScriptController {
     const { scriptId, sceneId } = req.params;
     const updates = req.body;
 
-    const script = scriptStore.get(scriptId);
-    if (!script) {
+    const stored = scriptStore.get(scriptId);
+    if (!stored) {
       return res.status(404).json({ error: `Script "${scriptId}" not found.` });
     }
+    const script = new ScriptModel(stored.toJSON());
 
     // Find which section owns this visual
     const section = script.sections.find(s => s.visuals.some(v => v.id === sceneId));
@@ -124,11 +143,20 @@ export class ScriptController {
     if (updates.title     !== undefined) scene.title       = updates.title;
     if (updates.subtitle  !== undefined) scene.subtitle    = updates.subtitle;
     if (updates.payload   !== undefined) scene.payload     = { ...scene.payload, ...updates.payload };
-
-    // Recalculate estimated duration after narration edit
-    if (updates.narration !== undefined) {
-      script.calculateEstimatedDuration();
+    for (const field of ['purpose','narrationAnchor','durationFraction','beats','continuityId','exampleId','operationRange','operationMode']) {
+      if (updates[field] !== undefined) scene[field] = updates[field];
     }
+
+    // Single shared invalidation policy (also used by save() and updateExample) — resets
+    // stale audio/timing from recomputed dependency hashes, not from the narration-only
+    // check this used to be. May set needsAlignmentReview if exampleId/operationRange changed.
+    reconcileDerivedState(script, stored);
+    // An explicit narrationAnchor edit is a human confirming the anchor still makes sense —
+    // takes precedence over whatever reconcileDerivedState just decided.
+    if (updates.narrationAnchor !== undefined) scene.needsAlignmentReview = false;
+
+    try { validateStoryboard(script); }
+    catch(error) { return res.status(400).json({error:error.message}); }
 
     script.updatedAt = new Date().toISOString();
     scriptStore.set(scriptId, script);
@@ -136,6 +164,65 @@ export class ScriptController {
     res.json({ scene, estimatedTotalDurationSec: script.estimatedTotalDurationSec });
   }
 
+  /**
+   * PATCH /api/script/:scriptId/example/:exampleId
+   * Update a shared example's corpus/inputData/query/assumptions/evidence/operations.
+   * Invalidates derived timing for every section containing a visual that references it,
+   * not just one — this is the route that makes "editing shared inputs invalidates every
+   * referencing visual" reachable at all (there was previously no way to edit an example).
+   */
+  static updateExample(req, res) {
+    const { scriptId, exampleId } = req.params;
+    const updates = req.body;
+
+    const stored = scriptStore.get(scriptId);
+    if (!stored) return res.status(404).json({ error: `Script "${scriptId}" not found.` });
+    const script = new ScriptModel(stored.toJSON());
+
+    const example = script.examples.find(e => e.id === exampleId);
+    if (!example) return res.status(404).json({ error: `Example "${exampleId}" not found in script "${scriptId}".` });
+
+    // id is deliberately excluded — it's the route parameter; silently renaming it here
+    // would orphan every visual that references the old value.
+    for (const field of ['scenario','corpus','inputData','query','assumptions','evidence','operations']) {
+      if (updates[field] !== undefined) example[field] = updates[field];
+    }
+    try {
+      // Re-run normalizeExample's strict shape checks against the merged result — a whitelist
+      // assignment above bypasses construction-time validation otherwise.
+      Object.assign(example, normalizeExample(example));
+      reconcileDerivedState(script, stored);
+      validateStoryboard(script);
+    } catch(error) { return res.status(400).json({error:error.message}); }
+
+    script.updatedAt = new Date().toISOString();
+    scriptStore.set(scriptId, script);
+
+    res.json({ example, estimatedTotalDurationSec: script.estimatedTotalDurationSec });
+  }
+
+
+  /**
+   * GET /api/script/:scriptId/example/:exampleId/trace
+   * Runs the example's operations for real and returns the computed trace/results — the
+   * "inspect derived results" half of the editor workflow (editing inputs already works via
+   * save()/updateExample(); this is the missing read side, Phase 8).
+   */
+  static getExampleTrace(req, res) {
+    const { scriptId, exampleId } = req.params;
+    const stored = scriptStore.get(scriptId);
+    if (!stored) return res.status(404).json({ error: `Script "${scriptId}" not found.` });
+
+    const example = stored.examples.find(e => e.id === exampleId);
+    if (!example) return res.status(404).json({ error: `Example "${exampleId}" not found in script "${scriptId}".` });
+
+    try {
+      const result = executeOperations(example);
+      res.json(result);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
 
   // Expose store for use by renderController (Phase 5)
   static getScriptStore() {

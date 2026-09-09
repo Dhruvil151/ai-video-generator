@@ -16,6 +16,7 @@ import os from 'os';
 import { bundle } from '@remotion/bundler';
 import { renderMedia, selectComposition } from '@remotion/renderer';
 import { ENV } from '../config/env.js';
+import { sceneTimings } from '../../shared/timeline.mjs';
 
 const ENTRY_POINT = path.resolve(ENV.ROOT_DIR, 'src/remotion/index.ts');
 const COMPOSITION_ID = 'EducationalVideo';
@@ -55,6 +56,7 @@ export async function renderScene({
   fromFrame,
   durationFrames,
   scenes,
+  examples,
   bgMusicUrl,
   topic,
   outputPath,
@@ -63,14 +65,14 @@ export async function renderScene({
   // Total duration of all scenes combined (needed to size the full composition)
   const totalFrames = scenes.reduce((sum, s) => {
     const dur = s.actualDurationSec || s.estimatedDurationSec || 10;
-    return sum + Math.ceil(dur * FPS);
+    return sum + (s.durationFrames || Math.ceil(dur * FPS));
   }, 0);
 
   // Select composition and resolve its props
   const composition = await selectComposition({
     serveUrl: bundleDir,
     id: COMPOSITION_ID,
-    inputProps: { scenes, bgMusicUrl, topic: topic || '' },
+    inputProps: { scenes, examples: examples || [], bgMusicUrl, topic: topic || '' },
   });
 
   // Override duration to the full video length (all scenes must be in the timeline
@@ -89,11 +91,11 @@ export async function renderScene({
       serveUrl: bundleDir,
       codec: 'h264',
       outputLocation: outputPath,
-      inputProps: { scenes, bgMusicUrl, topic: topic || '' },
+      inputProps: { scenes, examples: examples || [], bgMusicUrl, topic: topic || '' },
       frameRange: [fromFrame, fromFrame + durationFrames - 1],
       concurrency,
-      imageFormat: 'jpeg',
-      jpegQuality: 88,
+      imageFormat: 'png',
+      crf: 1,
       muted: true,   // FFmpeg handles the final audio mix in renderPipeline.js — do NOT bake audio here
       logLevel: 'warn',
     });
@@ -101,7 +103,7 @@ export async function renderScene({
     if (attempt < MAX_RETRIES) {
       console.warn(`[RenderService] Scene render failed (attempt ${attempt + 1}), retrying…`);
       await new Promise(r => setTimeout(r, 2000 * (attempt + 1)));
-      return renderScene({ bundleDir, fromFrame, durationFrames, scenes, bgMusicUrl, outputPath, attempt: attempt + 1 });
+      return renderScene({ bundleDir, fromFrame, durationFrames, scenes, examples, bgMusicUrl, topic, outputPath, attempt: attempt + 1 });
     }
     throw err;
   }
@@ -112,12 +114,5 @@ export async function renderScene({
  * Returns array of { scene, fromFrame, durationFrames }.
  */
 export function computeSceneTimings(scenes) {
-  let cursor = 0;
-  return scenes.map(scene => {
-    const durationSec = scene.actualDurationSec || scene.estimatedDurationSec || 10;
-    const durationFrames = Math.ceil(durationSec * FPS);
-    const from = cursor;
-    cursor += durationFrames;
-    return { scene, fromFrame: from, durationFrames };
-  });
+  return sceneTimings(scenes, FPS);
 }

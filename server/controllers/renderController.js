@@ -12,6 +12,8 @@ import { scriptStore } from './scriptController.js';
 import { videoQueue }   from '../queues/videoQueue.js';
 import { RenderJobModel, JOB_STATUS } from '../models/RenderJob.js';
 import { AVAILABLE_VOICES, DEFAULT_VOICE } from '../config/constants.js';
+import { ScriptModel } from '../models/Script.js';
+import { validateStoryboard } from '../services/storyboardValidation.js';
 
 // ── In-memory job store (jobId → RenderJobModel) ─────────────────────────────
 // Exported so renderPipeline can update it from the worker process.
@@ -29,6 +31,12 @@ export async function startRender(req, res) {
   let script = inlineScript || scriptStore.get(scriptId);
   if (!script) {
     return res.status(404).json({ error: `Script "${scriptId}" not found. Re-generate it.` });
+  }
+  try {
+    script = new ScriptModel(script);
+    validateStoryboard(script);
+  } catch (error) {
+    return res.status(400).json({error:error.message});
   }
 
   // Validate voice
@@ -112,6 +120,8 @@ export async function getJobStatus(req, res) {
       // Sync state transitions
       if (bullState === 'completed' && model.status !== JOB_STATUS.COMPLETED) {
         model.outputVideoUrl = bullJob.returnvalue?.outputUrl || bullJob.returnvalue;
+        model.srtUrl = bullJob.returnvalue?.srtUrl || null;
+        model.warnings = bullJob.returnvalue?.warnings || [];
         model.updateProgress(JOB_STATUS.COMPLETED, 100, 'Video ready!');
       } else if (bullState === 'failed' && model.status !== JOB_STATUS.FAILED) {
         const err = bullJob.failedReason || 'Unknown error';

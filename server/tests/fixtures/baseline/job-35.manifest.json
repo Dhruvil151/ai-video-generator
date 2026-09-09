@@ -1,0 +1,1131 @@
+{
+  "manifestVersion": 1,
+  "createdAt": "2026-09-08T11:13:21.908Z",
+  "renderer": {
+    "fps": 30,
+    "width": 1920,
+    "height": 1080,
+    "frameFormat": "png",
+    "intermediateCrf": 0,
+    "finalCrf": 16
+  },
+  "script": {
+    "id": "script_1788847325699",
+    "schemaVersion": 1,
+    "brief": {},
+    "generation": {
+      "source": "imported"
+    },
+    "topic": "TypeScript Generics",
+    "mode": "short",
+    "targetDurationMinutes": 3,
+    "estimatedTotalDurationSec": 153.3,
+    "actualTotalDurationSec": 0,
+    "voice": "en-US-ChristopherNeural",
+    "sections": [
+      {
+        "id": "section_1",
+        "narration": "You've typed a function parameter as `any` just to get your code compiling, haven't you? We've all done it. But the second you use `any`, you strip away every single safety guarantee TypeScript gives you. You lose autocomplete, you lose compile-time checking, and you invite runtime crashes into production. <break time='0.6s'/> Generics exist to solve this exact dilemma: they give you ultimate flexibility without throwing away type safety.",
+        "objective": "",
+        "visuals": [
+          {
+            "id": "section_1_v0",
+            "type": "TitleScene",
+            "title": "TypeScript Generics Unlocked",
+            "subtitle": "Flexible code without giving up type safety",
+            "purpose": "",
+            "narrationAnchor": "",
+            "continuityId": "",
+            "beats": [],
+            "durationFrames": 0,
+            "durationFraction": 1,
+            "startSec": 0,
+            "durationSec": 0,
+            "payload": {
+              "engine": "",
+              "inputs": {},
+              "layout": "orbital",
+              "code": "",
+              "language": "javascript",
+              "filename": "index.js",
+              "highlightLines": [],
+              "callout": "",
+              "nodes": [],
+              "connections": [],
+              "flowDescription": "",
+              "bulletPoints": [],
+              "badges": [
+                "Type Safety",
+                "Reusable Code",
+                "Zero Runtime Cost"
+              ],
+              "keyTakeaway": "Generics give you parameterized types—reusability and strict safety combined.",
+              "leftTitle": "",
+              "leftPoints": [],
+              "rightTitle": "",
+              "rightPoints": [],
+              "topicTag": "TypeScript",
+              "steps": [],
+              "stats": [],
+              "commands": [],
+              "termTitle": "Terminal",
+              "quote": "",
+              "author": "",
+              "context": "",
+              "diffLines": [],
+              "headers": [],
+              "rows": [],
+              "xLabels": [],
+              "series": [],
+              "yUnit": "",
+              "rootName": "",
+              "tree": [],
+              "chapterNumber": "",
+              "chapterTitle": "",
+              "description": "",
+              "actors": [],
+              "messages": [],
+              "query": "",
+              "videoUrl": ""
+            }
+          }
+        ],
+        "audioPath": "job-35.assets/section-0.mp3",
+        "audioUrl": null,
+        "actualDurationSec": 27.528000000000002,
+        "estimatedDurationSec": 28.885714285714286,
+        "subtitles": [
+          {
+            "text": "You've typed a function parameter as `any` just to get your code compiling, haven't you?",
+            "start": 0.1,
+            "end": 5.212,
+            "startMs": 100,
+            "endMs": 5212,
+            "type": "sentence"
+          },
+          {
+            "text": "We've all done it.",
+            "start": 5.162,
+            "end": 6.95,
+            "startMs": 5162,
+            "endMs": 6950,
+            "type": "sentence"
+          },
+          {
+            "text": "But the second you use `any`, you strip away every single safety guarantee TypeScript gives you.",
+            "start": 6.95,
+            "end": 12.963,
+            "startMs": 6950,
+            "endMs": 12962,
+            "type": "sentence"
+          },
+          {
+            "text": "You lose autocomplete, you lose compile-time checking, and you invite runtime crashes into production.",
+            "start": 12.963,
+            "end": 19.7,
+            "startMs": 12962,
+            "endMs": 19700,
+            "type": "sentence"
+          },
+          {
+            "text": "Generics exist to solve this exact dilemma: they give you ultimate flexibility without throwing away type safety.",
+            "start": 19.7,
+            "end": 26.862,
+            "startMs": 19700,
+            "endMs": 26862,
+            "type": "sentence"
+          }
+        ]
+      },
+      {
+        "id": "section_2",
+        "narration": "Think of a generic as a parameter, but instead of passing a value like a string or number, you're passing a type. When you write a generic function, TypeScript looks at the real runtime argument and automatically captures its exact shape on the fly. <break time='0.6s'/> Look at the difference. Without generics, using `any` completely destroys your return type tracking. The editor has no idea what comes out. But add `<T>` to the signature, and TypeScript dynamically binds `T` to whatever enters the function. If you pass an array of numbers, `T` becomes `number`. Return `T`, and your editor immediately knows every method available on that return value. Total safety, zero duplication.",
+        "objective": "",
+        "visuals": [
+          {
+            "id": "section_2_v0",
+            "type": "CodeDiffScene",
+            "title": "Any vs Generics",
+            "subtitle": "Preserving concrete types across boundaries",
+            "purpose": "",
+            "narrationAnchor": "",
+            "continuityId": "",
+            "beats": [],
+            "durationFrames": 0,
+            "durationFraction": 0.5,
+            "startSec": 0,
+            "durationSec": 0,
+            "payload": {
+              "engine": "",
+              "inputs": {},
+              "layout": "unified",
+              "code": "",
+              "language": "javascript",
+              "filename": "index.js",
+              "highlightLines": [],
+              "callout": "",
+              "nodes": [],
+              "connections": [],
+              "flowDescription": "",
+              "bulletPoints": [],
+              "badges": [],
+              "keyTakeaway": "",
+              "leftTitle": "",
+              "leftPoints": [],
+              "rightTitle": "",
+              "rightPoints": [],
+              "topicTag": "",
+              "steps": [],
+              "stats": [],
+              "commands": [],
+              "termTitle": "Terminal",
+              "quote": "",
+              "author": "",
+              "context": "",
+              "diffLines": [
+                {
+                  "type": "context",
+                  "text": "// Bad: lose types with any"
+                },
+                {
+                  "type": "remove",
+                  "text": "function wrap(val: any): any {"
+                },
+                {
+                  "type": "remove",
+                  "text": "  return { value: val };"
+                },
+                {
+                  "type": "remove",
+                  "text": "}"
+                },
+                {
+                  "type": "context",
+                  "text": "// Good: retain exact types with Generics"
+                },
+                {
+                  "type": "add",
+                  "text": "function wrap<T>(val: T): { value: T } {"
+                },
+                {
+                  "type": "add",
+                  "text": "  return { value: val };"
+                },
+                {
+                  "type": "add",
+                  "text": "}"
+                }
+              ],
+              "headers": [],
+              "rows": [],
+              "xLabels": [],
+              "series": [],
+              "yUnit": "",
+              "rootName": "",
+              "tree": [],
+              "chapterNumber": "",
+              "chapterTitle": "",
+              "description": "",
+              "actors": [],
+              "messages": [],
+              "query": "",
+              "videoUrl": ""
+            }
+          },
+          {
+            "id": "section_2_v1",
+            "type": "CodeEditorScene",
+            "title": "Automatic Type Inference",
+            "subtitle": "TypeScript infers T automatically",
+            "purpose": "",
+            "narrationAnchor": "",
+            "continuityId": "",
+            "beats": [],
+            "durationFrames": 0,
+            "durationFraction": 0.5,
+            "startSec": 0,
+            "durationSec": 0,
+            "payload": {
+              "engine": "",
+              "inputs": {},
+              "layout": "fullscreen",
+              "code": "function getFirst<T>(arr: T[]): T | undefined {\n  return arr[0];\n}\n\nconst num = getFirst([10, 20, 30]); // num is number\nconst str = getFirst(['a', 'b']);  // str is string",
+              "language": "typescript",
+              "filename": "generics.ts",
+              "highlightLines": [
+                1,
+                5,
+                6
+              ],
+              "callout": "TypeScript captures the argument type without explicit annotations.",
+              "nodes": [],
+              "connections": [],
+              "flowDescription": "",
+              "bulletPoints": [],
+              "badges": [],
+              "keyTakeaway": "",
+              "leftTitle": "",
+              "leftPoints": [],
+              "rightTitle": "",
+              "rightPoints": [],
+              "topicTag": "",
+              "steps": [],
+              "stats": [],
+              "commands": [],
+              "termTitle": "Terminal",
+              "quote": "",
+              "author": "",
+              "context": "",
+              "diffLines": [],
+              "headers": [],
+              "rows": [],
+              "xLabels": [],
+              "series": [],
+              "yUnit": "",
+              "rootName": "",
+              "tree": [],
+              "chapterNumber": "",
+              "chapterTitle": "",
+              "description": "",
+              "actors": [],
+              "messages": [],
+              "query": "",
+              "videoUrl": ""
+            }
+          }
+        ],
+        "audioPath": "job-35.assets/section-1.mp3",
+        "audioUrl": null,
+        "actualDurationSec": 44.712,
+        "estimatedDurationSec": 48.17142857142857,
+        "subtitles": [
+          {
+            "text": "Think of a generic as a parameter, but instead of passing a value like a string or number, you're passing a type.",
+            "start": 0.1,
+            "end": 6.912,
+            "startMs": 100,
+            "endMs": 6912,
+            "type": "sentence"
+          },
+          {
+            "text": "When you write a generic function, TypeScript looks at the real runtime argument and automatically captures its exact shape on the fly.",
+            "start": 6.862,
+            "end": 14.775,
+            "startMs": 6862,
+            "endMs": 14775,
+            "type": "sentence"
+          },
+          {
+            "text": "Look at the difference.",
+            "start": 14.775,
+            "end": 16.775,
+            "startMs": 14775,
+            "endMs": 16775,
+            "type": "sentence"
+          },
+          {
+            "text": "Without generics, using `any` completely destroys your return type tracking.",
+            "start": 16.775,
+            "end": 21.837,
+            "startMs": 16775,
+            "endMs": 21838,
+            "type": "sentence"
+          },
+          {
+            "text": "The editor has no idea what comes out.",
+            "start": 21.837,
+            "end": 24.987,
+            "startMs": 21838,
+            "endMs": 24987,
+            "type": "sentence"
+          },
+          {
+            "text": "But add `` to the signature, and TypeScript dynamically binds `T` to whatever enters the function.",
+            "start": 24.988,
+            "end": 31.075,
+            "startMs": 24988,
+            "endMs": 31075,
+            "type": "sentence"
+          },
+          {
+            "text": "If you pass an array of numbers, `T` becomes `number`.",
+            "start": 31.075,
+            "end": 34.862,
+            "startMs": 31075,
+            "endMs": 34862,
+            "type": "sentence"
+          },
+          {
+            "text": "Return `T`, and your editor immediately knows every method available on that return value.",
+            "start": 34.862,
+            "end": 40.825,
+            "startMs": 34862,
+            "endMs": 40825,
+            "type": "sentence"
+          },
+          {
+            "text": "Total safety, zero duplication.",
+            "start": 40.825,
+            "end": 44.062,
+            "startMs": 40825,
+            "endMs": 44062,
+            "type": "sentence"
+          }
+        ]
+      },
+      {
+        "id": "section_3",
+        "narration": "Generics get absurdly powerful once you add constraints using the `extends` keyword. Unconstrained generics accept literally anything — numbers, booleans, null. But what if your generic function needs to access a `.length` property, or pick a key from an object? <break time='0.6s'/> By writing `T extends { length: number }`, you enforce that `T` must have a length, while still preserving its exact shape. Take it further with the `keyof` operator. You can make a second type parameter, `K`, extend `keyof T`. Suddenly, you've built a function that guarantees at compile-time that a property exists on an object. Pass an invalid key? TypeScript catches it instantly before you even hit save.",
+        "objective": "",
+        "visuals": [
+          {
+            "id": "section_3_v0",
+            "type": "CodeEditorScene",
+            "title": "Generic Constraints",
+            "subtitle": "Restricting generics with extends",
+            "purpose": "",
+            "narrationAnchor": "",
+            "continuityId": "",
+            "beats": [],
+            "durationFrames": 0,
+            "durationFraction": 0.5,
+            "startSec": 0,
+            "durationSec": 0,
+            "payload": {
+              "engine": "",
+              "inputs": {},
+              "layout": "fullscreen",
+              "code": "interface HasLength {\n  length: number;\n}\n\nfunction logLength<T extends HasLength>(item: T): T {\n  console.log(item.length);\n  return item;\n}\n\nlogLength('hello');   // OK\nlogLength([1, 2, 3]); // OK\nlogLength(123);       // Error: number has no .length",
+              "language": "typescript",
+              "filename": "constraints.ts",
+              "highlightLines": [
+                5,
+                12
+              ],
+              "callout": "Extends acts as a guard, requiring specific properties.",
+              "nodes": [],
+              "connections": [],
+              "flowDescription": "",
+              "bulletPoints": [],
+              "badges": [],
+              "keyTakeaway": "",
+              "leftTitle": "",
+              "leftPoints": [],
+              "rightTitle": "",
+              "rightPoints": [],
+              "topicTag": "",
+              "steps": [],
+              "stats": [],
+              "commands": [],
+              "termTitle": "Terminal",
+              "quote": "",
+              "author": "",
+              "context": "",
+              "diffLines": [],
+              "headers": [],
+              "rows": [],
+              "xLabels": [],
+              "series": [],
+              "yUnit": "",
+              "rootName": "",
+              "tree": [],
+              "chapterNumber": "",
+              "chapterTitle": "",
+              "description": "",
+              "actors": [],
+              "messages": [],
+              "query": "",
+              "videoUrl": ""
+            }
+          },
+          {
+            "id": "section_3_v1",
+            "type": "ConceptCardScene",
+            "title": "Generic Building Blocks",
+            "subtitle": "The four pillars of advanced generics",
+            "purpose": "",
+            "narrationAnchor": "",
+            "continuityId": "",
+            "beats": [],
+            "durationFrames": 0,
+            "durationFraction": 0.5,
+            "startSec": 0,
+            "durationSec": 0,
+            "payload": {
+              "engine": "",
+              "inputs": {},
+              "layout": "grid",
+              "code": "",
+              "language": "javascript",
+              "filename": "index.js",
+              "highlightLines": [],
+              "callout": "",
+              "nodes": [],
+              "connections": [],
+              "flowDescription": "",
+              "bulletPoints": [
+                {
+                  "icon": "code",
+                  "title": "Type Variable <T>",
+                  "description": "Placeholder captured during function call"
+                },
+                {
+                  "icon": "shield",
+                  "title": "Extends Constraint",
+                  "description": "Limits T to specific interfaces or types"
+                },
+                {
+                  "icon": "key",
+                  "title": "Keyof Operator",
+                  "description": "Extracts union of keys from object type T"
+                },
+                {
+                  "icon": "check-circle",
+                  "title": "Type Inference",
+                  "description": "No explicit annotations needed at caller side"
+                }
+              ],
+              "badges": [],
+              "keyTakeaway": "",
+              "leftTitle": "",
+              "leftPoints": [],
+              "rightTitle": "",
+              "rightPoints": [],
+              "topicTag": "",
+              "steps": [],
+              "stats": [],
+              "commands": [],
+              "termTitle": "Terminal",
+              "quote": "",
+              "author": "",
+              "context": "",
+              "diffLines": [],
+              "headers": [],
+              "rows": [],
+              "xLabels": [],
+              "series": [],
+              "yUnit": "",
+              "rootName": "",
+              "tree": [],
+              "chapterNumber": "",
+              "chapterTitle": "",
+              "description": "",
+              "actors": [],
+              "messages": [],
+              "query": "",
+              "videoUrl": ""
+            }
+          }
+        ],
+        "audioPath": "job-35.assets/section-2.mp3",
+        "audioUrl": null,
+        "actualDurationSec": 46.512,
+        "estimatedDurationSec": 47.31428571428572,
+        "subtitles": [
+          {
+            "text": "Generics get absurdly powerful once you add constraints using the `extends` keyword.",
+            "start": 0.1,
+            "end": 5.412,
+            "startMs": 100,
+            "endMs": 5412,
+            "type": "sentence"
+          },
+          {
+            "text": "Unconstrained generics accept literally anything — numbers, booleans, null.",
+            "start": 5.362,
+            "end": 11.137,
+            "startMs": 5362,
+            "endMs": 11138,
+            "type": "sentence"
+          },
+          {
+            "text": "But what if your generic function needs to access a `.length` property, or pick a key from an object?",
+            "start": 11.137,
+            "end": 17.538,
+            "startMs": 11138,
+            "endMs": 17538,
+            "type": "sentence"
+          },
+          {
+            "text": "By writing `T extends { length: number }`, you enforce that `T` must have a length, while still preserving its exact shape.",
+            "start": 17.538,
+            "end": 25.388,
+            "startMs": 17538,
+            "endMs": 25388,
+            "type": "sentence"
+          },
+          {
+            "text": "Take it further with the `keyof` operator.",
+            "start": 25.387,
+            "end": 28.35,
+            "startMs": 25388,
+            "endMs": 28350,
+            "type": "sentence"
+          },
+          {
+            "text": "You can make a second type parameter, `K`, extend `keyof T`.",
+            "start": 28.35,
+            "end": 33.113,
+            "startMs": 28350,
+            "endMs": 33113,
+            "type": "sentence"
+          },
+          {
+            "text": "Suddenly, you've built a function that guarantees at compile-time that a property exists on an object.",
+            "start": 33.112,
+            "end": 39.587,
+            "startMs": 33112,
+            "endMs": 39588,
+            "type": "sentence"
+          },
+          {
+            "text": "Pass an invalid key?",
+            "start": 39.587,
+            "end": 41.837,
+            "startMs": 39588,
+            "endMs": 41838,
+            "type": "sentence"
+          },
+          {
+            "text": "TypeScript catches it instantly before you even hit save.",
+            "start": 41.837,
+            "end": 45.85,
+            "startMs": 41838,
+            "endMs": 45850,
+            "type": "sentence"
+          }
+        ]
+      },
+      {
+        "id": "section_4",
+        "narration": "Generics aren't just academic syntax or visual clutter in your codebase. They're the core engine that powers type inference across every major library you use — from React hooks to Zod schemas. <break time='0.6s'/> Next time you feel tempted to type a parameter as `any` or write five duplicate functions, write a single generic signature instead. Your editor will thank you, and your production logs will stay clean.",
+        "objective": "",
+        "visuals": [
+          {
+            "id": "section_4_v0",
+            "type": "SummaryScene",
+            "title": "Generics Checklist",
+            "subtitle": "Write cleaner, safer TypeScript today",
+            "purpose": "",
+            "narrationAnchor": "",
+            "continuityId": "",
+            "beats": [],
+            "durationFrames": 0,
+            "durationFraction": 1,
+            "startSec": 0,
+            "durationSec": 0,
+            "payload": {
+              "engine": "",
+              "inputs": {},
+              "layout": "checklist",
+              "code": "",
+              "language": "javascript",
+              "filename": "index.js",
+              "highlightLines": [],
+              "callout": "",
+              "nodes": [],
+              "connections": [],
+              "flowDescription": "",
+              "bulletPoints": [
+                {
+                  "title": "Ditch Any",
+                  "description": "Replace `any` with generics to keep complete end-to-end type safety."
+                },
+                {
+                  "title": "Leverage Inference",
+                  "description": "Let TypeScript infer generic parameters automatically whenever possible."
+                },
+                {
+                  "title": "Constrain Wisely",
+                  "description": "Use `extends` and `keyof` to enforce exact property requirements."
+                }
+              ],
+              "badges": [],
+              "keyTakeaway": "Generics turn TypeScript from a static checker into a flexible type-level engine.",
+              "leftTitle": "",
+              "leftPoints": [],
+              "rightTitle": "",
+              "rightPoints": [],
+              "topicTag": "",
+              "steps": [],
+              "stats": [],
+              "commands": [],
+              "termTitle": "Terminal",
+              "quote": "",
+              "author": "",
+              "context": "",
+              "diffLines": [],
+              "headers": [],
+              "rows": [],
+              "xLabels": [],
+              "series": [],
+              "yUnit": "",
+              "rootName": "",
+              "tree": [],
+              "chapterNumber": "",
+              "chapterTitle": "",
+              "description": "",
+              "actors": [],
+              "messages": [],
+              "query": "",
+              "videoUrl": ""
+            }
+          }
+        ],
+        "audioPath": "job-35.assets/section-3.mp3",
+        "audioUrl": null,
+        "actualDurationSec": 25.752000000000002,
+        "estimatedDurationSec": 28.885714285714286,
+        "subtitles": [
+          {
+            "text": "Generics aren't just academic syntax or visual clutter in your codebase.",
+            "start": 0.1,
+            "end": 5.137,
+            "startMs": 100,
+            "endMs": 5137,
+            "type": "sentence"
+          },
+          {
+            "text": "They're the core engine that powers type inference across every major library you use — from React hooks to Zod schemas.",
+            "start": 5.088,
+            "end": 12.675,
+            "startMs": 5088,
+            "endMs": 12675,
+            "type": "sentence"
+          },
+          {
+            "text": "Next time you feel tempted to type a parameter as `any` or write five duplicate functions, write a single generic signature instead.",
+            "start": 12.675,
+            "end": 20.712,
+            "startMs": 12675,
+            "endMs": 20712,
+            "type": "sentence"
+          },
+          {
+            "text": "Your editor will thank you, and your production logs will stay clean.",
+            "start": 20.712,
+            "end": 25.1,
+            "startMs": 20712,
+            "endMs": 25100,
+            "type": "sentence"
+          }
+        ]
+      }
+    ],
+    "scenes": [
+      {
+        "id": "section_1_v0",
+        "type": "TitleScene",
+        "title": "TypeScript Generics Unlocked",
+        "subtitle": "Flexible code without giving up type safety",
+        "narration": "You've typed a function parameter as `any` just to get your code compiling, haven't you? We've all done it. But the second you use `any`, you strip away every single safety guarantee TypeScript gives you. You lose autocomplete, you lose compile-time checking, and you invite runtime crashes into production. <break time='0.6s'/> Generics exist to solve this exact dilemma: they give you ultimate flexibility without throwing away type safety.",
+        "actualDurationSec": 0,
+        "estimatedDurationSec": 0,
+        "payload": {
+          "engine": "",
+          "inputs": {},
+          "layout": "orbital",
+          "code": "",
+          "language": "javascript",
+          "filename": "index.js",
+          "highlightLines": [],
+          "callout": "",
+          "nodes": [],
+          "connections": [],
+          "flowDescription": "",
+          "bulletPoints": [],
+          "badges": [
+            "Type Safety",
+            "Reusable Code",
+            "Zero Runtime Cost"
+          ],
+          "keyTakeaway": "Generics give you parameterized types—reusability and strict safety combined.",
+          "leftTitle": "",
+          "leftPoints": [],
+          "rightTitle": "",
+          "rightPoints": [],
+          "topicTag": "TypeScript",
+          "steps": [],
+          "stats": [],
+          "commands": [],
+          "termTitle": "Terminal",
+          "quote": "",
+          "author": "",
+          "context": "",
+          "diffLines": [],
+          "headers": [],
+          "rows": [],
+          "xLabels": [],
+          "series": [],
+          "yUnit": "",
+          "rootName": "",
+          "tree": [],
+          "chapterNumber": "",
+          "chapterTitle": "",
+          "description": "",
+          "actors": [],
+          "messages": [],
+          "query": "",
+          "videoUrl": ""
+        }
+      },
+      {
+        "id": "section_2_v0",
+        "type": "CodeDiffScene",
+        "title": "Any vs Generics",
+        "subtitle": "Preserving concrete types across boundaries",
+        "narration": "Think of a generic as a parameter, but instead of passing a value like a string or number, you're passing a type. When you write a generic function, TypeScript looks at the real runtime argument and automatically captures its exact shape on the fly. <break time='0.6s'/> Look at the difference. Without generics, using `any` completely destroys your return type tracking. The editor has no idea what comes out. But add `<T>` to the signature, and TypeScript dynamically binds `T` to whatever enters the function. If you pass an array of numbers, `T` becomes `number`. Return `T`, and your editor immediately knows every method available on that return value. Total safety, zero duplication.",
+        "actualDurationSec": 0,
+        "estimatedDurationSec": 0,
+        "payload": {
+          "engine": "",
+          "inputs": {},
+          "layout": "unified",
+          "code": "",
+          "language": "javascript",
+          "filename": "index.js",
+          "highlightLines": [],
+          "callout": "",
+          "nodes": [],
+          "connections": [],
+          "flowDescription": "",
+          "bulletPoints": [],
+          "badges": [],
+          "keyTakeaway": "",
+          "leftTitle": "",
+          "leftPoints": [],
+          "rightTitle": "",
+          "rightPoints": [],
+          "topicTag": "",
+          "steps": [],
+          "stats": [],
+          "commands": [],
+          "termTitle": "Terminal",
+          "quote": "",
+          "author": "",
+          "context": "",
+          "diffLines": [
+            {
+              "type": "context",
+              "text": "// Bad: lose types with any"
+            },
+            {
+              "type": "remove",
+              "text": "function wrap(val: any): any {"
+            },
+            {
+              "type": "remove",
+              "text": "  return { value: val };"
+            },
+            {
+              "type": "remove",
+              "text": "}"
+            },
+            {
+              "type": "context",
+              "text": "// Good: retain exact types with Generics"
+            },
+            {
+              "type": "add",
+              "text": "function wrap<T>(val: T): { value: T } {"
+            },
+            {
+              "type": "add",
+              "text": "  return { value: val };"
+            },
+            {
+              "type": "add",
+              "text": "}"
+            }
+          ],
+          "headers": [],
+          "rows": [],
+          "xLabels": [],
+          "series": [],
+          "yUnit": "",
+          "rootName": "",
+          "tree": [],
+          "chapterNumber": "",
+          "chapterTitle": "",
+          "description": "",
+          "actors": [],
+          "messages": [],
+          "query": "",
+          "videoUrl": ""
+        }
+      },
+      {
+        "id": "section_2_v1",
+        "type": "CodeEditorScene",
+        "title": "Automatic Type Inference",
+        "subtitle": "TypeScript infers T automatically",
+        "narration": "Think of a generic as a parameter, but instead of passing a value like a string or number, you're passing a type. When you write a generic function, TypeScript looks at the real runtime argument and automatically captures its exact shape on the fly. <break time='0.6s'/> Look at the difference. Without generics, using `any` completely destroys your return type tracking. The editor has no idea what comes out. But add `<T>` to the signature, and TypeScript dynamically binds `T` to whatever enters the function. If you pass an array of numbers, `T` becomes `number`. Return `T`, and your editor immediately knows every method available on that return value. Total safety, zero duplication.",
+        "actualDurationSec": 0,
+        "estimatedDurationSec": 0,
+        "payload": {
+          "engine": "",
+          "inputs": {},
+          "layout": "fullscreen",
+          "code": "function getFirst<T>(arr: T[]): T | undefined {\n  return arr[0];\n}\n\nconst num = getFirst([10, 20, 30]); // num is number\nconst str = getFirst(['a', 'b']);  // str is string",
+          "language": "typescript",
+          "filename": "generics.ts",
+          "highlightLines": [
+            1,
+            5,
+            6
+          ],
+          "callout": "TypeScript captures the argument type without explicit annotations.",
+          "nodes": [],
+          "connections": [],
+          "flowDescription": "",
+          "bulletPoints": [],
+          "badges": [],
+          "keyTakeaway": "",
+          "leftTitle": "",
+          "leftPoints": [],
+          "rightTitle": "",
+          "rightPoints": [],
+          "topicTag": "",
+          "steps": [],
+          "stats": [],
+          "commands": [],
+          "termTitle": "Terminal",
+          "quote": "",
+          "author": "",
+          "context": "",
+          "diffLines": [],
+          "headers": [],
+          "rows": [],
+          "xLabels": [],
+          "series": [],
+          "yUnit": "",
+          "rootName": "",
+          "tree": [],
+          "chapterNumber": "",
+          "chapterTitle": "",
+          "description": "",
+          "actors": [],
+          "messages": [],
+          "query": "",
+          "videoUrl": ""
+        }
+      },
+      {
+        "id": "section_3_v0",
+        "type": "CodeEditorScene",
+        "title": "Generic Constraints",
+        "subtitle": "Restricting generics with extends",
+        "narration": "Generics get absurdly powerful once you add constraints using the `extends` keyword. Unconstrained generics accept literally anything — numbers, booleans, null. But what if your generic function needs to access a `.length` property, or pick a key from an object? <break time='0.6s'/> By writing `T extends { length: number }`, you enforce that `T` must have a length, while still preserving its exact shape. Take it further with the `keyof` operator. You can make a second type parameter, `K`, extend `keyof T`. Suddenly, you've built a function that guarantees at compile-time that a property exists on an object. Pass an invalid key? TypeScript catches it instantly before you even hit save.",
+        "actualDurationSec": 0,
+        "estimatedDurationSec": 0,
+        "payload": {
+          "engine": "",
+          "inputs": {},
+          "layout": "fullscreen",
+          "code": "interface HasLength {\n  length: number;\n}\n\nfunction logLength<T extends HasLength>(item: T): T {\n  console.log(item.length);\n  return item;\n}\n\nlogLength('hello');   // OK\nlogLength([1, 2, 3]); // OK\nlogLength(123);       // Error: number has no .length",
+          "language": "typescript",
+          "filename": "constraints.ts",
+          "highlightLines": [
+            5,
+            12
+          ],
+          "callout": "Extends acts as a guard, requiring specific properties.",
+          "nodes": [],
+          "connections": [],
+          "flowDescription": "",
+          "bulletPoints": [],
+          "badges": [],
+          "keyTakeaway": "",
+          "leftTitle": "",
+          "leftPoints": [],
+          "rightTitle": "",
+          "rightPoints": [],
+          "topicTag": "",
+          "steps": [],
+          "stats": [],
+          "commands": [],
+          "termTitle": "Terminal",
+          "quote": "",
+          "author": "",
+          "context": "",
+          "diffLines": [],
+          "headers": [],
+          "rows": [],
+          "xLabels": [],
+          "series": [],
+          "yUnit": "",
+          "rootName": "",
+          "tree": [],
+          "chapterNumber": "",
+          "chapterTitle": "",
+          "description": "",
+          "actors": [],
+          "messages": [],
+          "query": "",
+          "videoUrl": ""
+        }
+      },
+      {
+        "id": "section_3_v1",
+        "type": "ConceptCardScene",
+        "title": "Generic Building Blocks",
+        "subtitle": "The four pillars of advanced generics",
+        "narration": "Generics get absurdly powerful once you add constraints using the `extends` keyword. Unconstrained generics accept literally anything — numbers, booleans, null. But what if your generic function needs to access a `.length` property, or pick a key from an object? <break time='0.6s'/> By writing `T extends { length: number }`, you enforce that `T` must have a length, while still preserving its exact shape. Take it further with the `keyof` operator. You can make a second type parameter, `K`, extend `keyof T`. Suddenly, you've built a function that guarantees at compile-time that a property exists on an object. Pass an invalid key? TypeScript catches it instantly before you even hit save.",
+        "actualDurationSec": 0,
+        "estimatedDurationSec": 0,
+        "payload": {
+          "engine": "",
+          "inputs": {},
+          "layout": "grid",
+          "code": "",
+          "language": "javascript",
+          "filename": "index.js",
+          "highlightLines": [],
+          "callout": "",
+          "nodes": [],
+          "connections": [],
+          "flowDescription": "",
+          "bulletPoints": [
+            {
+              "icon": "code",
+              "title": "Type Variable <T>",
+              "description": "Placeholder captured during function call"
+            },
+            {
+              "icon": "shield",
+              "title": "Extends Constraint",
+              "description": "Limits T to specific interfaces or types"
+            },
+            {
+              "icon": "key",
+              "title": "Keyof Operator",
+              "description": "Extracts union of keys from object type T"
+            },
+            {
+              "icon": "check-circle",
+              "title": "Type Inference",
+              "description": "No explicit annotations needed at caller side"
+            }
+          ],
+          "badges": [],
+          "keyTakeaway": "",
+          "leftTitle": "",
+          "leftPoints": [],
+          "rightTitle": "",
+          "rightPoints": [],
+          "topicTag": "",
+          "steps": [],
+          "stats": [],
+          "commands": [],
+          "termTitle": "Terminal",
+          "quote": "",
+          "author": "",
+          "context": "",
+          "diffLines": [],
+          "headers": [],
+          "rows": [],
+          "xLabels": [],
+          "series": [],
+          "yUnit": "",
+          "rootName": "",
+          "tree": [],
+          "chapterNumber": "",
+          "chapterTitle": "",
+          "description": "",
+          "actors": [],
+          "messages": [],
+          "query": "",
+          "videoUrl": ""
+        }
+      },
+      {
+        "id": "section_4_v0",
+        "type": "SummaryScene",
+        "title": "Generics Checklist",
+        "subtitle": "Write cleaner, safer TypeScript today",
+        "narration": "Generics aren't just academic syntax or visual clutter in your codebase. They're the core engine that powers type inference across every major library you use — from React hooks to Zod schemas. <break time='0.6s'/> Next time you feel tempted to type a parameter as `any` or write five duplicate functions, write a single generic signature instead. Your editor will thank you, and your production logs will stay clean.",
+        "actualDurationSec": 0,
+        "estimatedDurationSec": 0,
+        "payload": {
+          "engine": "",
+          "inputs": {},
+          "layout": "checklist",
+          "code": "",
+          "language": "javascript",
+          "filename": "index.js",
+          "highlightLines": [],
+          "callout": "",
+          "nodes": [],
+          "connections": [],
+          "flowDescription": "",
+          "bulletPoints": [
+            {
+              "title": "Ditch Any",
+              "description": "Replace `any` with generics to keep complete end-to-end type safety."
+            },
+            {
+              "title": "Leverage Inference",
+              "description": "Let TypeScript infer generic parameters automatically whenever possible."
+            },
+            {
+              "title": "Constrain Wisely",
+              "description": "Use `extends` and `keyof` to enforce exact property requirements."
+            }
+          ],
+          "badges": [],
+          "keyTakeaway": "Generics turn TypeScript from a static checker into a flexible type-level engine.",
+          "leftTitle": "",
+          "leftPoints": [],
+          "rightTitle": "",
+          "rightPoints": [],
+          "topicTag": "",
+          "steps": [],
+          "stats": [],
+          "commands": [],
+          "termTitle": "Terminal",
+          "quote": "",
+          "author": "",
+          "context": "",
+          "diffLines": [],
+          "headers": [],
+          "rows": [],
+          "xLabels": [],
+          "series": [],
+          "yUnit": "",
+          "rootName": "",
+          "tree": [],
+          "chapterNumber": "",
+          "chapterTitle": "",
+          "description": "",
+          "actors": [],
+          "messages": [],
+          "query": "",
+          "videoUrl": ""
+        }
+      }
+    ],
+    "createdAt": "2026-09-08T06:02:05.700Z",
+    "updatedAt": "2026-09-08T11:13:21.894Z"
+  },
+  "assets": [
+    {
+      "path": "job-35.assets/section-0.mp3",
+      "sha256": "7da24963afedf1272be463af7045609cf0f78dddc54a782e78825e578f960a05"
+    },
+    {
+      "path": "job-35.assets/section-1.mp3",
+      "sha256": "0ea1715a3de64c9e3051703394c303a555044f5d8f41ac6d9c9f4000606d0009"
+    },
+    {
+      "path": "job-35.assets/section-2.mp3",
+      "sha256": "6e7a63d9560d06cd9d9c8a57d4e429b350bce13efe9ac97cda0cf953b92c0e38"
+    },
+    {
+      "path": "job-35.assets/section-3.mp3",
+      "sha256": "86f936bd1fcb2b303fe5567a3a55a5c53f9e3b2cd109e9639e800e286eed3334"
+    }
+  ],
+  "diagnostics": [],
+  "baseline": true,
+  "historicalRendererSettings": "unknown; original output retained in public/output"
+}

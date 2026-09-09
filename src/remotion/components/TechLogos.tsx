@@ -1,5 +1,7 @@
 // @ts-nocheck
 import React from 'react';
+import { Img, staticFile } from 'remotion';
+const SOURCED_LOGOS = {redis:'redis',docker:'docker',react:'react',javascript:'javascript',js:'javascript',typescript:'typescript',ts:'typescript',node:'nodedotjs',nodejs:'nodedotjs','node.js':'nodedotjs'};
 
 interface LogoProps { size?: number }
 
@@ -639,6 +641,7 @@ const LOGOS: Record<string, React.FC<LogoProps>> = {
  */
 export const TechLogo: React.FC<{ name: string; size?: number }> = ({ name, size = 32 }) => {
   const key = (name || '').toLowerCase().replace(/[^a-z0-9.\s]/g, '').trim();
+  if (SOURCED_LOGOS[key]) return <Img src={staticFile('tech/'+SOURCED_LOGOS[key]+'.svg')} alt={name} style={{width:size,height:size,background:'#fff',padding:4,borderRadius:4}} />;
   const Logo = LOGOS[key];
   if (!Logo) return null;
   return <Logo size={size} />;

@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate, spring, OffthreadVideo } from 'remotion';
+import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate, spring, OffthreadVideo, staticFile } from 'remotion';
 import React from 'react';
 import '../styles/video.css';
 
@@ -32,7 +32,7 @@ export const StockVideoScene = ({ scene, techPrimary, techSecondary }: any) => {
       {/* ── Full-bleed video OR gradient fallback ── */}
       {videoUrl ? (
         <OffthreadVideo
-          src={videoUrl}
+          src={videoUrl.startsWith('broll/') ? staticFile(videoUrl) : videoUrl}
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
           muted
         />

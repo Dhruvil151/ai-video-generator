@@ -4,6 +4,10 @@
   "description": "Zero-cost AI-powered educational video generator using Gemini, Edge-TTS, Remotion, and BullMQ.",
   "type": "module",
   "scripts": {
+    "test:local": "node --test server/tests/*.test.js",
+    "review:fixtures": "node scripts/render-fixture.mjs",
+    "review:baseline": "node scripts/capture-baseline.mjs",
+    "preflight": "node scripts/preflight.mjs",
     "dev:server": "nodemon server/server.js",
     "dev:worker": "nodemon server/worker.js",
     "dev:client": "vite",

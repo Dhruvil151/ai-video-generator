@@ -1,0 +1,1199 @@
+{
+  "manifestVersion": 1,
+  "createdAt": "2026-09-08T11:13:21.934Z",
+  "renderer": {
+    "fps": 30,
+    "width": 1920,
+    "height": 1080,
+    "frameFormat": "png",
+    "intermediateCrf": 0,
+    "finalCrf": 16
+  },
+  "script": {
+    "id": "script_1788849913844",
+    "schemaVersion": 1,
+    "brief": {},
+    "generation": {
+      "source": "imported"
+    },
+    "topic": "Docker Containers",
+    "mode": "short",
+    "targetDurationMinutes": 3,
+    "estimatedTotalDurationSec": 154.6,
+    "actualTotalDurationSec": 0,
+    "voice": "en-US-ChristopherNeural",
+    "sections": [
+      {
+        "id": "section_1",
+        "narration": "You've probably heard that Docker containers are like lightweight virtual machines. That explanation is simple, popular, and fundamentally wrong. <break time='0.6s'/> A container doesn't boot a guest operating system, run a hypervisor, or virtualize hardware. It's just a standard Linux process running directly on your host CPU. Docker is simply tricking that process into believing it's alone on the machine. Once you understand how that trick works, container optimization becomes second nature.",
+        "objective": "",
+        "visuals": [
+          {
+            "id": "section_1_v0",
+            "type": "TitleScene",
+            "title": "How Docker Actually Works",
+            "subtitle": "It's not a virtual machine — it's a process",
+            "purpose": "",
+            "narrationAnchor": "",
+            "continuityId": "",
+            "beats": [],
+            "durationFrames": 0,
+            "durationFraction": 1,
+            "startSec": 0,
+            "durationSec": 0,
+            "payload": {
+              "engine": "",
+              "inputs": {},
+              "layout": "orbital",
+              "code": "",
+              "language": "javascript",
+              "filename": "index.js",
+              "highlightLines": [],
+              "callout": "",
+              "nodes": [],
+              "connections": [],
+              "flowDescription": "",
+              "bulletPoints": [],
+              "badges": [
+                "Linux Kernel",
+                "Namespaces",
+                "Layer Caching"
+              ],
+              "keyTakeaway": "Containers aren't virtual machines — they are isolated host processes.",
+              "leftTitle": "",
+              "leftPoints": [],
+              "rightTitle": "",
+              "rightPoints": [],
+              "topicTag": "Docker Containers",
+              "steps": [],
+              "stats": [],
+              "commands": [],
+              "termTitle": "Terminal",
+              "quote": "",
+              "author": "",
+              "context": "",
+              "diffLines": [],
+              "headers": [],
+              "rows": [],
+              "xLabels": [],
+              "series": [],
+              "yUnit": "",
+              "rootName": "",
+              "tree": [],
+              "chapterNumber": "",
+              "chapterTitle": "",
+              "description": "",
+              "actors": [],
+              "messages": [],
+              "query": "",
+              "videoUrl": ""
+            }
+          }
+        ],
+        "audioPath": "job-37.assets/section-0.mp3",
+        "audioUrl": null,
+        "actualDurationSec": 32.016,
+        "estimatedDurationSec": 30.6,
+        "subtitles": [
+          {
+            "text": "You've probably heard that Docker containers are like lightweight virtual machines.",
+            "start": 0.1,
+            "end": 5.05,
+            "startMs": 100,
+            "endMs": 5050,
+            "type": "sentence"
+          },
+          {
+            "text": "That explanation is simple, popular, and fundamentally wrong.",
+            "start": 5,
+            "end": 9.688,
+            "startMs": 5000,
+            "endMs": 9688,
+            "type": "sentence"
+          },
+          {
+            "text": "A container doesn't boot a guest operating system, run a hypervisor, or virtualize hardware.",
+            "start": 9.688,
+            "end": 16.05,
+            "startMs": 9688,
+            "endMs": 16050,
+            "type": "sentence"
+          },
+          {
+            "text": "It's just a standard Linux process running directly on your host CPU.",
+            "start": 16.05,
+            "end": 20.913,
+            "startMs": 16050,
+            "endMs": 20912,
+            "type": "sentence"
+          },
+          {
+            "text": "Docker is simply tricking that process into believing it's alone on the machine.",
+            "start": 20.913,
+            "end": 25.638,
+            "startMs": 20912,
+            "endMs": 25638,
+            "type": "sentence"
+          },
+          {
+            "text": "Once you understand how that trick works, container optimization becomes second nature.",
+            "start": 25.637,
+            "end": 31.362,
+            "startMs": 25638,
+            "endMs": 31362,
+            "type": "sentence"
+          }
+        ]
+      },
+      {
+        "id": "section_2",
+        "narration": "So how does Docker pull off this illusion? Through two core Linux kernel features: Namespaces and Control Groups. Namespaces restrict what a process can see. A PID namespace gives the process its own fake tree where it thinks it's PID 1. A Net namespace isolates network interfaces, and a Mount namespace hides the host filesystem. Control Groups, or cgroups, restrict what the process can use — capping memory, CPU shares, and I/O. <break time='0.6s'/> That's why spinning up a container takes milliseconds instead of minutes. When you run docker run, you're launching a host process wrapped in kernel security boundaries. There is no guest kernel overhead, no wasted RAM, and zero hypervisor translation.",
+        "objective": "",
+        "visuals": [
+          {
+            "id": "section_2_v0",
+            "type": "ComparisonScene",
+            "title": "VMs vs Containers",
+            "subtitle": "Architecture breakdown",
+            "purpose": "",
+            "narrationAnchor": "",
+            "continuityId": "",
+            "beats": [],
+            "durationFrames": 0,
+            "durationFraction": 0.5,
+            "startSec": 0,
+            "durationSec": 0,
+            "payload": {
+              "engine": "",
+              "inputs": {},
+              "layout": "split",
+              "code": "",
+              "language": "javascript",
+              "filename": "index.js",
+              "highlightLines": [],
+              "callout": "",
+              "nodes": [],
+              "connections": [],
+              "flowDescription": "",
+              "bulletPoints": [],
+              "badges": [],
+              "keyTakeaway": "",
+              "leftTitle": "Virtual Machine",
+              "leftPoints": [
+                "App Code & Dependencies",
+                "Full Guest OS Kernel",
+                "Hypervisor Layer",
+                "Slow Boot (Minutes)",
+                "High Memory Overhead"
+              ],
+              "rightTitle": "Docker Container",
+              "rightPoints": [
+                "App Code & Dependencies",
+                "Isolated Namespaces/Cgroups",
+                "Shared Host Linux Kernel",
+                "Instant Boot (Milliseconds)",
+                "Zero Hypervisor Overhead"
+              ],
+              "topicTag": "",
+              "steps": [],
+              "stats": [],
+              "commands": [],
+              "termTitle": "Terminal",
+              "quote": "",
+              "author": "",
+              "context": "",
+              "diffLines": [],
+              "headers": [],
+              "rows": [],
+              "xLabels": [],
+              "series": [],
+              "yUnit": "",
+              "rootName": "",
+              "tree": [],
+              "chapterNumber": "",
+              "chapterTitle": "",
+              "description": "",
+              "actors": [],
+              "messages": [],
+              "query": "",
+              "videoUrl": ""
+            }
+          },
+          {
+            "id": "section_2_v1",
+            "type": "ArchitectureScene",
+            "title": "Kernel Isolation",
+            "subtitle": "Namespaces + cgroups",
+            "purpose": "",
+            "narrationAnchor": "",
+            "continuityId": "",
+            "beats": [],
+            "durationFrames": 0,
+            "durationFraction": 0.5,
+            "startSec": 0,
+            "durationSec": 0,
+            "payload": {
+              "engine": "",
+              "inputs": {},
+              "layout": "flow",
+              "code": "",
+              "language": "javascript",
+              "filename": "index.js",
+              "highlightLines": [],
+              "callout": "",
+              "nodes": [
+                {
+                  "id": "host",
+                  "label": "Host Kernel",
+                  "icon": "cpu"
+                },
+                {
+                  "id": "ns",
+                  "label": "Namespaces",
+                  "icon": "shield"
+                },
+                {
+                  "id": "cg",
+                  "label": "cgroups",
+                  "icon": "settings"
+                },
+                {
+                  "id": "proc",
+                  "label": "Container Process",
+                  "icon": "box"
+                }
+              ],
+              "connections": [
+                {
+                  "from": "host",
+                  "to": "ns",
+                  "label": "isolates visibility"
+                },
+                {
+                  "from": "host",
+                  "to": "cg",
+                  "label": "limits resources"
+                },
+                {
+                  "from": "ns",
+                  "to": "proc",
+                  "label": "wraps PID/Net/Mount"
+                },
+                {
+                  "from": "cg",
+                  "to": "proc",
+                  "label": "caps CPU/RAM"
+                }
+              ],
+              "flowDescription": "",
+              "bulletPoints": [],
+              "badges": [],
+              "keyTakeaway": "",
+              "leftTitle": "",
+              "leftPoints": [],
+              "rightTitle": "",
+              "rightPoints": [],
+              "topicTag": "",
+              "steps": [],
+              "stats": [],
+              "commands": [],
+              "termTitle": "Terminal",
+              "quote": "",
+              "author": "",
+              "context": "",
+              "diffLines": [],
+              "headers": [],
+              "rows": [],
+              "xLabels": [],
+              "series": [],
+              "yUnit": "",
+              "rootName": "",
+              "tree": [],
+              "chapterNumber": "",
+              "chapterTitle": "",
+              "description": "",
+              "actors": [],
+              "messages": [],
+              "query": "",
+              "videoUrl": ""
+            }
+          }
+        ],
+        "audioPath": "job-37.assets/section-1.mp3",
+        "audioUrl": null,
+        "actualDurationSec": 49.992000000000004,
+        "estimatedDurationSec": 48.17142857142857,
+        "subtitles": [
+          {
+            "text": "So how does Docker pull off this illusion?",
+            "start": 0.1,
+            "end": 3.15,
+            "startMs": 100,
+            "endMs": 3150,
+            "type": "sentence"
+          },
+          {
+            "text": "Through two core Linux kernel features: Namespaces and Control Groups.",
+            "start": 3.1,
+            "end": 8.412,
+            "startMs": 3100,
+            "endMs": 8412,
+            "type": "sentence"
+          },
+          {
+            "text": "Namespaces restrict what a process can see.",
+            "start": 8.412,
+            "end": 11.863,
+            "startMs": 8412,
+            "endMs": 11862,
+            "type": "sentence"
+          },
+          {
+            "text": "A PID namespace gives the process its own fake tree where it thinks it's PID 1.",
+            "start": 11.863,
+            "end": 17.95,
+            "startMs": 11862,
+            "endMs": 17950,
+            "type": "sentence"
+          },
+          {
+            "text": "A Net namespace isolates network interfaces, and a Mount namespace hides the host filesystem.",
+            "start": 17.95,
+            "end": 24.538,
+            "startMs": 17950,
+            "endMs": 24538,
+            "type": "sentence"
+          },
+          {
+            "text": "Control Groups, or cgroups, restrict what the process can use — capping memory, CPU shares, and I/O.",
+            "start": 24.538,
+            "end": 32.8,
+            "startMs": 24538,
+            "endMs": 32800,
+            "type": "sentence"
+          },
+          {
+            "text": "That's why spinning up a container takes milliseconds instead of minutes.",
+            "start": 32.8,
+            "end": 37.25,
+            "startMs": 32800,
+            "endMs": 37250,
+            "type": "sentence"
+          },
+          {
+            "text": "When you run docker run, you're launching a host process wrapped in kernel security boundaries.",
+            "start": 37.25,
+            "end": 43.038,
+            "startMs": 37250,
+            "endMs": 43038,
+            "type": "sentence"
+          },
+          {
+            "text": "There is no guest kernel overhead, no wasted RAM, and zero hypervisor translation.",
+            "start": 43.038,
+            "end": 49.325,
+            "startMs": 43038,
+            "endMs": 49325,
+            "type": "sentence"
+          }
+        ]
+      },
+      {
+        "id": "section_3",
+        "narration": "The second major piece of Docker magic is the Union File System. Container images aren't big monolithic disk images — they are stacks of immutable, read-only layers. When you run a container, Docker slaps a paper-thin, writable layer right on top using copy-on-write logic. But here's where most developers ruin their build times: every single directive in a Dockerfile creates a layer that gets cached. <break time='0.6s'/> If you copy your entire source tree before running your package manager, every tiny code change invalidates the cache for all subsequent steps. By copying just package.json first, running install, and then copying your application code, Docker reuses cached layers instantly. That tiny order flip turns five-minute CI/CD builds into five seconds.",
+        "objective": "",
+        "visuals": [
+          {
+            "id": "section_3_v0",
+            "type": "CodeDiffScene",
+            "title": "Dockerfile Optimization",
+            "subtitle": "Leveraging layer caching",
+            "purpose": "",
+            "narrationAnchor": "",
+            "continuityId": "",
+            "beats": [],
+            "durationFrames": 0,
+            "durationFraction": 0.5,
+            "startSec": 0,
+            "durationSec": 0,
+            "payload": {
+              "engine": "",
+              "inputs": {},
+              "layout": "unified",
+              "code": "",
+              "language": "javascript",
+              "filename": "index.js",
+              "highlightLines": [],
+              "callout": "",
+              "nodes": [],
+              "connections": [],
+              "flowDescription": "",
+              "bulletPoints": [],
+              "badges": [],
+              "keyTakeaway": "",
+              "leftTitle": "",
+              "leftPoints": [],
+              "rightTitle": "",
+              "rightPoints": [],
+              "topicTag": "",
+              "steps": [],
+              "stats": [],
+              "commands": [],
+              "termTitle": "Terminal",
+              "quote": "",
+              "author": "",
+              "context": "",
+              "diffLines": [
+                {
+                  "type": "context",
+                  "text": "FROM node:20-alpine"
+                },
+                {
+                  "type": "context",
+                  "text": "WORKDIR /app"
+                },
+                {
+                  "type": "remove",
+                  "text": "- COPY . ."
+                },
+                {
+                  "type": "remove",
+                  "text": "- RUN npm install"
+                },
+                {
+                  "type": "add",
+                  "text": "+ COPY package*.json ./"
+                },
+                {
+                  "type": "add",
+                  "text": "+ RUN npm install"
+                },
+                {
+                  "type": "add",
+                  "text": "+ COPY . ."
+                },
+                {
+                  "type": "context",
+                  "text": "CMD [\"node\", \"server.js\"]"
+                }
+              ],
+              "headers": [],
+              "rows": [],
+              "xLabels": [],
+              "series": [],
+              "yUnit": "",
+              "rootName": "",
+              "tree": [],
+              "chapterNumber": "",
+              "chapterTitle": "",
+              "description": "",
+              "actors": [],
+              "messages": [],
+              "query": "",
+              "videoUrl": ""
+            }
+          },
+          {
+            "id": "section_3_v1",
+            "type": "ConceptCardScene",
+            "title": "Overlay File System",
+            "subtitle": "How layers stack up",
+            "purpose": "",
+            "narrationAnchor": "",
+            "continuityId": "",
+            "beats": [],
+            "durationFrames": 0,
+            "durationFraction": 0.5,
+            "startSec": 0,
+            "durationSec": 0,
+            "payload": {
+              "engine": "",
+              "inputs": {},
+              "layout": "stack",
+              "code": "",
+              "language": "javascript",
+              "filename": "index.js",
+              "highlightLines": [],
+              "callout": "",
+              "nodes": [],
+              "connections": [],
+              "flowDescription": "",
+              "bulletPoints": [
+                {
+                  "icon": "layers",
+                  "title": "Read-Only Base Layers",
+                  "description": "OS dependencies and runtimes shared across instances"
+                },
+                {
+                  "icon": "refresh-cw",
+                  "title": "Dependency Layer Cache",
+                  "description": "Skipped entirely when package manifests haven't changed"
+                },
+                {
+                  "icon": "box",
+                  "title": "Thin Writable Layer",
+                  "description": "Container-specific mutations written here at runtime"
+                }
+              ],
+              "badges": [],
+              "keyTakeaway": "",
+              "leftTitle": "",
+              "leftPoints": [],
+              "rightTitle": "",
+              "rightPoints": [],
+              "topicTag": "",
+              "steps": [],
+              "stats": [],
+              "commands": [],
+              "termTitle": "Terminal",
+              "quote": "",
+              "author": "",
+              "context": "",
+              "diffLines": [],
+              "headers": [],
+              "rows": [],
+              "xLabels": [],
+              "series": [],
+              "yUnit": "",
+              "rootName": "",
+              "tree": [],
+              "chapterNumber": "",
+              "chapterTitle": "",
+              "description": "",
+              "actors": [],
+              "messages": [],
+              "query": "",
+              "videoUrl": ""
+            }
+          }
+        ],
+        "audioPath": "job-37.assets/section-2.mp3",
+        "audioUrl": null,
+        "actualDurationSec": 51.24,
+        "estimatedDurationSec": 50.74285714285715,
+        "subtitles": [
+          {
+            "text": "The second major piece of Docker magic is the Union File System.",
+            "start": 0.1,
+            "end": 4.612,
+            "startMs": 100,
+            "endMs": 4612,
+            "type": "sentence"
+          },
+          {
+            "text": "Container images aren't big monolithic disk images — they are stacks of immutable, read-only layers.",
+            "start": 4.562,
+            "end": 11.4,
+            "startMs": 4562,
+            "endMs": 11400,
+            "type": "sentence"
+          },
+          {
+            "text": "When you run a container, Docker slaps a paper-thin, writable layer right on top using copy-on-write logic.",
+            "start": 11.4,
+            "end": 18.562,
+            "startMs": 11400,
+            "endMs": 18562,
+            "type": "sentence"
+          },
+          {
+            "text": "But here's where most developers ruin their build times: every single directive in a Dockerfile creates a layer that gets cached.",
+            "start": 18.562,
+            "end": 26.225,
+            "startMs": 18562,
+            "endMs": 26225,
+            "type": "sentence"
+          },
+          {
+            "text": "If you copy your entire source tree before running your package manager, every tiny code change invalidates the cache for all subsequent steps.",
+            "start": 26.225,
+            "end": 35.088,
+            "startMs": 26225,
+            "endMs": 35088,
+            "type": "sentence"
+          },
+          {
+            "text": "By copying just package.json first, running install, and then copying your application code, Docker reuses cached layers instantly.",
+            "start": 35.087,
+            "end": 44.5,
+            "startMs": 35088,
+            "endMs": 44500,
+            "type": "sentence"
+          },
+          {
+            "text": "That tiny order flip turns five-minute CI/CD builds into five seconds.",
+            "start": 44.5,
+            "end": 50.575,
+            "startMs": 44500,
+            "endMs": 50575,
+            "type": "sentence"
+          }
+        ]
+      },
+      {
+        "id": "section_4",
+        "narration": "Stop thinking of containers as mini virtual machines and start treating them as isolated, immutable process wrappers. They share your host kernel, leverage Namespaces for isolation, Cgroups for resource limits, and cached filesystem layers for lightning-fast deployments. <break time='0.6s'/> Master your Dockerfile layer order, respect kernel boundaries, and your build pipelines and production servers will run faster than ever.",
+        "objective": "",
+        "visuals": [
+          {
+            "id": "section_4_v0",
+            "type": "SummaryScene",
+            "title": "Docker Mental Model",
+            "subtitle": "Key engineering takeaways",
+            "purpose": "",
+            "narrationAnchor": "",
+            "continuityId": "",
+            "beats": [],
+            "durationFrames": 0,
+            "durationFraction": 1,
+            "startSec": 0,
+            "durationSec": 0,
+            "payload": {
+              "engine": "",
+              "inputs": {},
+              "layout": "checklist",
+              "code": "",
+              "language": "javascript",
+              "filename": "index.js",
+              "highlightLines": [],
+              "callout": "",
+              "nodes": [],
+              "connections": [],
+              "flowDescription": "",
+              "bulletPoints": [
+                {
+                  "title": "Processes, Not VMs",
+                  "description": "Direct execution on host kernel via namespaces and cgroups."
+                },
+                {
+                  "title": "Optimize Layer Order",
+                  "description": "Copy lockfiles before code to maximize layer cache hits."
+                },
+                {
+                  "title": "Immutable Deployments",
+                  "description": "Guaranteed identical behavior from local dev to production."
+                }
+              ],
+              "badges": [],
+              "keyTakeaway": "Containers don't virtualize hardware — they optimize process execution.",
+              "leftTitle": "",
+              "leftPoints": [],
+              "rightTitle": "",
+              "rightPoints": [],
+              "topicTag": "",
+              "steps": [],
+              "stats": [],
+              "commands": [],
+              "termTitle": "Terminal",
+              "quote": "",
+              "author": "",
+              "context": "",
+              "diffLines": [],
+              "headers": [],
+              "rows": [],
+              "xLabels": [],
+              "series": [],
+              "yUnit": "",
+              "rootName": "",
+              "tree": [],
+              "chapterNumber": "",
+              "chapterTitle": "",
+              "description": "",
+              "actors": [],
+              "messages": [],
+              "query": "",
+              "videoUrl": ""
+            }
+          }
+        ],
+        "audioPath": "job-37.assets/section-3.mp3",
+        "audioUrl": null,
+        "actualDurationSec": 26.184,
+        "estimatedDurationSec": 25.02857142857143,
+        "subtitles": [
+          {
+            "text": "Stop thinking of containers as mini virtual machines and start treating them as isolated, immutable process wrappers.",
+            "start": 0.1,
+            "end": 7.587,
+            "startMs": 100,
+            "endMs": 7587,
+            "type": "sentence"
+          },
+          {
+            "text": "They share your host kernel, leverage Namespaces for isolation, Cgroups for resource limits, and cached filesystem layers for lightning-fast deployments.",
+            "start": 7.537,
+            "end": 17.3,
+            "startMs": 7538,
+            "endMs": 17300,
+            "type": "sentence"
+          },
+          {
+            "text": "Master your Dockerfile layer order, respect kernel boundaries, and your build pipelines and production servers will run faster than ever.",
+            "start": 17.3,
+            "end": 25.513,
+            "startMs": 17300,
+            "endMs": 25513,
+            "type": "sentence"
+          }
+        ]
+      }
+    ],
+    "scenes": [
+      {
+        "id": "section_1_v0",
+        "type": "TitleScene",
+        "title": "How Docker Actually Works",
+        "subtitle": "It's not a virtual machine — it's a process",
+        "narration": "You've probably heard that Docker containers are like lightweight virtual machines. That explanation is simple, popular, and fundamentally wrong. <break time='0.6s'/> A container doesn't boot a guest operating system, run a hypervisor, or virtualize hardware. It's just a standard Linux process running directly on your host CPU. Docker is simply tricking that process into believing it's alone on the machine. Once you understand how that trick works, container optimization becomes second nature.",
+        "actualDurationSec": 0,
+        "estimatedDurationSec": 0,
+        "payload": {
+          "engine": "",
+          "inputs": {},
+          "layout": "orbital",
+          "code": "",
+          "language": "javascript",
+          "filename": "index.js",
+          "highlightLines": [],
+          "callout": "",
+          "nodes": [],
+          "connections": [],
+          "flowDescription": "",
+          "bulletPoints": [],
+          "badges": [
+            "Linux Kernel",
+            "Namespaces",
+            "Layer Caching"
+          ],
+          "keyTakeaway": "Containers aren't virtual machines — they are isolated host processes.",
+          "leftTitle": "",
+          "leftPoints": [],
+          "rightTitle": "",
+          "rightPoints": [],
+          "topicTag": "Docker Containers",
+          "steps": [],
+          "stats": [],
+          "commands": [],
+          "termTitle": "Terminal",
+          "quote": "",
+          "author": "",
+          "context": "",
+          "diffLines": [],
+          "headers": [],
+          "rows": [],
+          "xLabels": [],
+          "series": [],
+          "yUnit": "",
+          "rootName": "",
+          "tree": [],
+          "chapterNumber": "",
+          "chapterTitle": "",
+          "description": "",
+          "actors": [],
+          "messages": [],
+          "query": "",
+          "videoUrl": ""
+        }
+      },
+      {
+        "id": "section_2_v0",
+        "type": "ComparisonScene",
+        "title": "VMs vs Containers",
+        "subtitle": "Architecture breakdown",
+        "narration": "So how does Docker pull off this illusion? Through two core Linux kernel features: Namespaces and Control Groups. Namespaces restrict what a process can see. A PID namespace gives the process its own fake tree where it thinks it's PID 1. A Net namespace isolates network interfaces, and a Mount namespace hides the host filesystem. Control Groups, or cgroups, restrict what the process can use — capping memory, CPU shares, and I/O. <break time='0.6s'/> That's why spinning up a container takes milliseconds instead of minutes. When you run docker run, you're launching a host process wrapped in kernel security boundaries. There is no guest kernel overhead, no wasted RAM, and zero hypervisor translation.",
+        "actualDurationSec": 0,
+        "estimatedDurationSec": 0,
+        "payload": {
+          "engine": "",
+          "inputs": {},
+          "layout": "split",
+          "code": "",
+          "language": "javascript",
+          "filename": "index.js",
+          "highlightLines": [],
+          "callout": "",
+          "nodes": [],
+          "connections": [],
+          "flowDescription": "",
+          "bulletPoints": [],
+          "badges": [],
+          "keyTakeaway": "",
+          "leftTitle": "Virtual Machine",
+          "leftPoints": [
+            "App Code & Dependencies",
+            "Full Guest OS Kernel",
+            "Hypervisor Layer",
+            "Slow Boot (Minutes)",
+            "High Memory Overhead"
+          ],
+          "rightTitle": "Docker Container",
+          "rightPoints": [
+            "App Code & Dependencies",
+            "Isolated Namespaces/Cgroups",
+            "Shared Host Linux Kernel",
+            "Instant Boot (Milliseconds)",
+            "Zero Hypervisor Overhead"
+          ],
+          "topicTag": "",
+          "steps": [],
+          "stats": [],
+          "commands": [],
+          "termTitle": "Terminal",
+          "quote": "",
+          "author": "",
+          "context": "",
+          "diffLines": [],
+          "headers": [],
+          "rows": [],
+          "xLabels": [],
+          "series": [],
+          "yUnit": "",
+          "rootName": "",
+          "tree": [],
+          "chapterNumber": "",
+          "chapterTitle": "",
+          "description": "",
+          "actors": [],
+          "messages": [],
+          "query": "",
+          "videoUrl": ""
+        }
+      },
+      {
+        "id": "section_2_v1",
+        "type": "ArchitectureScene",
+        "title": "Kernel Isolation",
+        "subtitle": "Namespaces + cgroups",
+        "narration": "So how does Docker pull off this illusion? Through two core Linux kernel features: Namespaces and Control Groups. Namespaces restrict what a process can see. A PID namespace gives the process its own fake tree where it thinks it's PID 1. A Net namespace isolates network interfaces, and a Mount namespace hides the host filesystem. Control Groups, or cgroups, restrict what the process can use — capping memory, CPU shares, and I/O. <break time='0.6s'/> That's why spinning up a container takes milliseconds instead of minutes. When you run docker run, you're launching a host process wrapped in kernel security boundaries. There is no guest kernel overhead, no wasted RAM, and zero hypervisor translation.",
+        "actualDurationSec": 0,
+        "estimatedDurationSec": 0,
+        "payload": {
+          "engine": "",
+          "inputs": {},
+          "layout": "flow",
+          "code": "",
+          "language": "javascript",
+          "filename": "index.js",
+          "highlightLines": [],
+          "callout": "",
+          "nodes": [
+            {
+              "id": "host",
+              "label": "Host Kernel",
+              "icon": "cpu"
+            },
+            {
+              "id": "ns",
+              "label": "Namespaces",
+              "icon": "shield"
+            },
+            {
+              "id": "cg",
+              "label": "cgroups",
+              "icon": "settings"
+            },
+            {
+              "id": "proc",
+              "label": "Container Process",
+              "icon": "box"
+            }
+          ],
+          "connections": [
+            {
+              "from": "host",
+              "to": "ns",
+              "label": "isolates visibility"
+            },
+            {
+              "from": "host",
+              "to": "cg",
+              "label": "limits resources"
+            },
+            {
+              "from": "ns",
+              "to": "proc",
+              "label": "wraps PID/Net/Mount"
+            },
+            {
+              "from": "cg",
+              "to": "proc",
+              "label": "caps CPU/RAM"
+            }
+          ],
+          "flowDescription": "",
+          "bulletPoints": [],
+          "badges": [],
+          "keyTakeaway": "",
+          "leftTitle": "",
+          "leftPoints": [],
+          "rightTitle": "",
+          "rightPoints": [],
+          "topicTag": "",
+          "steps": [],
+          "stats": [],
+          "commands": [],
+          "termTitle": "Terminal",
+          "quote": "",
+          "author": "",
+          "context": "",
+          "diffLines": [],
+          "headers": [],
+          "rows": [],
+          "xLabels": [],
+          "series": [],
+          "yUnit": "",
+          "rootName": "",
+          "tree": [],
+          "chapterNumber": "",
+          "chapterTitle": "",
+          "description": "",
+          "actors": [],
+          "messages": [],
+          "query": "",
+          "videoUrl": ""
+        }
+      },
+      {
+        "id": "section_3_v0",
+        "type": "CodeDiffScene",
+        "title": "Dockerfile Optimization",
+        "subtitle": "Leveraging layer caching",
+        "narration": "The second major piece of Docker magic is the Union File System. Container images aren't big monolithic disk images — they are stacks of immutable, read-only layers. When you run a container, Docker slaps a paper-thin, writable layer right on top using copy-on-write logic. But here's where most developers ruin their build times: every single directive in a Dockerfile creates a layer that gets cached. <break time='0.6s'/> If you copy your entire source tree before running your package manager, every tiny code change invalidates the cache for all subsequent steps. By copying just package.json first, running install, and then copying your application code, Docker reuses cached layers instantly. That tiny order flip turns five-minute CI/CD builds into five seconds.",
+        "actualDurationSec": 0,
+        "estimatedDurationSec": 0,
+        "payload": {
+          "engine": "",
+          "inputs": {},
+          "layout": "unified",
+          "code": "",
+          "language": "javascript",
+          "filename": "index.js",
+          "highlightLines": [],
+          "callout": "",
+          "nodes": [],
+          "connections": [],
+          "flowDescription": "",
+          "bulletPoints": [],
+          "badges": [],
+          "keyTakeaway": "",
+          "leftTitle": "",
+          "leftPoints": [],
+          "rightTitle": "",
+          "rightPoints": [],
+          "topicTag": "",
+          "steps": [],
+          "stats": [],
+          "commands": [],
+          "termTitle": "Terminal",
+          "quote": "",
+          "author": "",
+          "context": "",
+          "diffLines": [
+            {
+              "type": "context",
+              "text": "FROM node:20-alpine"
+            },
+            {
+              "type": "context",
+              "text": "WORKDIR /app"
+            },
+            {
+              "type": "remove",
+              "text": "- COPY . ."
+            },
+            {
+              "type": "remove",
+              "text": "- RUN npm install"
+            },
+            {
+              "type": "add",
+              "text": "+ COPY package*.json ./"
+            },
+            {
+              "type": "add",
+              "text": "+ RUN npm install"
+            },
+            {
+              "type": "add",
+              "text": "+ COPY . ."
+            },
+            {
+              "type": "context",
+              "text": "CMD [\"node\", \"server.js\"]"
+            }
+          ],
+          "headers": [],
+          "rows": [],
+          "xLabels": [],
+          "series": [],
+          "yUnit": "",
+          "rootName": "",
+          "tree": [],
+          "chapterNumber": "",
+          "chapterTitle": "",
+          "description": "",
+          "actors": [],
+          "messages": [],
+          "query": "",
+          "videoUrl": ""
+        }
+      },
+      {
+        "id": "section_3_v1",
+        "type": "ConceptCardScene",
+        "title": "Overlay File System",
+        "subtitle": "How layers stack up",
+        "narration": "The second major piece of Docker magic is the Union File System. Container images aren't big monolithic disk images — they are stacks of immutable, read-only layers. When you run a container, Docker slaps a paper-thin, writable layer right on top using copy-on-write logic. But here's where most developers ruin their build times: every single directive in a Dockerfile creates a layer that gets cached. <break time='0.6s'/> If you copy your entire source tree before running your package manager, every tiny code change invalidates the cache for all subsequent steps. By copying just package.json first, running install, and then copying your application code, Docker reuses cached layers instantly. That tiny order flip turns five-minute CI/CD builds into five seconds.",
+        "actualDurationSec": 0,
+        "estimatedDurationSec": 0,
+        "payload": {
+          "engine": "",
+          "inputs": {},
+          "layout": "stack",
+          "code": "",
+          "language": "javascript",
+          "filename": "index.js",
+          "highlightLines": [],
+          "callout": "",
+          "nodes": [],
+          "connections": [],
+          "flowDescription": "",
+          "bulletPoints": [
+            {
+              "icon": "layers",
+              "title": "Read-Only Base Layers",
+              "description": "OS dependencies and runtimes shared across instances"
+            },
+            {
+              "icon": "refresh-cw",
+              "title": "Dependency Layer Cache",
+              "description": "Skipped entirely when package manifests haven't changed"
+            },
+            {
+              "icon": "box",
+              "title": "Thin Writable Layer",
+              "description": "Container-specific mutations written here at runtime"
+            }
+          ],
+          "badges": [],
+          "keyTakeaway": "",
+          "leftTitle": "",
+          "leftPoints": [],
+          "rightTitle": "",
+          "rightPoints": [],
+          "topicTag": "",
+          "steps": [],
+          "stats": [],
+          "commands": [],
+          "termTitle": "Terminal",
+          "quote": "",
+          "author": "",
+          "context": "",
+          "diffLines": [],
+          "headers": [],
+          "rows": [],
+          "xLabels": [],
+          "series": [],
+          "yUnit": "",
+          "rootName": "",
+          "tree": [],
+          "chapterNumber": "",
+          "chapterTitle": "",
+          "description": "",
+          "actors": [],
+          "messages": [],
+          "query": "",
+          "videoUrl": ""
+        }
+      },
+      {
+        "id": "section_4_v0",
+        "type": "SummaryScene",
+        "title": "Docker Mental Model",
+        "subtitle": "Key engineering takeaways",
+        "narration": "Stop thinking of containers as mini virtual machines and start treating them as isolated, immutable process wrappers. They share your host kernel, leverage Namespaces for isolation, Cgroups for resource limits, and cached filesystem layers for lightning-fast deployments. <break time='0.6s'/> Master your Dockerfile layer order, respect kernel boundaries, and your build pipelines and production servers will run faster than ever.",
+        "actualDurationSec": 0,
+        "estimatedDurationSec": 0,
+        "payload": {
+          "engine": "",
+          "inputs": {},
+          "layout": "checklist",
+          "code": "",
+          "language": "javascript",
+          "filename": "index.js",
+          "highlightLines": [],
+          "callout": "",
+          "nodes": [],
+          "connections": [],
+          "flowDescription": "",
+          "bulletPoints": [
+            {
+              "title": "Processes, Not VMs",
+              "description": "Direct execution on host kernel via namespaces and cgroups."
+            },
+            {
+              "title": "Optimize Layer Order",
+              "description": "Copy lockfiles before code to maximize layer cache hits."
+            },
+            {
+              "title": "Immutable Deployments",
+              "description": "Guaranteed identical behavior from local dev to production."
+            }
+          ],
+          "badges": [],
+          "keyTakeaway": "Containers don't virtualize hardware — they optimize process execution.",
+          "leftTitle": "",
+          "leftPoints": [],
+          "rightTitle": "",
+          "rightPoints": [],
+          "topicTag": "",
+          "steps": [],
+          "stats": [],
+          "commands": [],
+          "termTitle": "Terminal",
+          "quote": "",
+          "author": "",
+          "context": "",
+          "diffLines": [],
+          "headers": [],
+          "rows": [],
+          "xLabels": [],
+          "series": [],
+          "yUnit": "",
+          "rootName": "",
+          "tree": [],
+          "chapterNumber": "",
+          "chapterTitle": "",
+          "description": "",
+          "actors": [],
+          "messages": [],
+          "query": "",
+          "videoUrl": ""
+        }
+      }
+    ],
+    "createdAt": "2026-09-08T06:45:13.844Z",
+    "updatedAt": "2026-09-08T11:13:21.923Z"
+  },
+  "assets": [
+    {
+      "path": "job-37.assets/section-0.mp3",
+      "sha256": "6ae8839667c1ed209241a4f2984ad8972f57928acce30cceef9e5d9710ea36e2"
+    },
+    {
+      "path": "job-37.assets/section-1.mp3",
+      "sha256": "34034092ad6232ee647369045cd373a5984d3602c57389e07bd08d74df28b507"
+    },
+    {
+      "path": "job-37.assets/section-2.mp3",
+      "sha256": "78e68fd33cb1f4e6d8d8d93cabe7e0584cd1a7bfa895ebb1843de6ae3e829c4f"
+    },
+    {
+      "path": "job-37.assets/section-3.mp3",
+      "sha256": "75167cb9b659e9effe36617baa7f2b9f7cadebcafc83cfe68aac452862e882ca"
+    }
+  ],
+  "diagnostics": [],
+  "baseline": true,
+  "historicalRendererSettings": "unknown; original output retained in public/output"
+}
