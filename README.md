@@ -10,6 +10,12 @@ For someone making an explainer, it brings scripting, scene selection, speech, a
 
 [Quick start](#try-it-locally) · [Architecture](#how-it-is-built) · [Recorded validation](IMPLEMENTATION_STATUS.md) · [Portfolio](https://github.com/Dhruvil151)
 
+## Watch a narrated output
+
+[![A generated explanation of indexing sample documents](docs/narrated-example.png)](docs/narrated-example.mp4)
+
+[Watch or download the 40-second narrated excerpt](docs/narrated-example.mp4). This is an excerpt from an existing local render, not a new live generation session. It shows document tokenization and posting-list construction in a simplified teaching model. [Provenance and limitations](docs/NARRATED_DEMO.md).
+
 ## See an animation sample
 
 ![Offline cache demonstration rendered by this project](docs/video-preview.gif)
@@ -61,6 +67,24 @@ The browser dashboard lives in `public/` and is bundled with Vite. React compone
 
 For implementation details, see [project documentation](PROJECT_DOCUMENTATION.md) and the [implementation status](IMPLEMENTATION_STATUS.md). Historical notes may describe older layouts; current source and checks are the reference for behavior.
 
+## Engineering decisions
+
+### Separate requests from rendering
+
+Express accepts requests while BullMQ and Redis dispatch long-running rendering to a worker. The browser can poll progress without keeping a single HTTP request open for the entire render. This local design is not a multi-user hosting service.
+
+### Review content before spending render time
+
+The workflow exposes an editable storyboard and validates its structure before rendering. Users can correct narration and scene choices before synthesis. Structural checks do not prove factual accuracy.
+
+### Reuse intermediate work
+
+Audio and scene caches retain intermediate media, while manifests record inputs and timing. This supports inspection and reuse; full bit-identical historical replay is not guaranteed.
+
+### Use React for video composition
+
+Remotion components express scenes and animation; the browser dashboard is plain JavaScript bundled by Vite. Scene rendering benefits from reusable components without claiming the dashboard itself is a React application.
+
 ## Checks and evidence
 
 ```sh
@@ -79,5 +103,9 @@ The implementation report records a completed end-to-end render, but also identi
 - Detailed-mode quality and broad input coverage need further validation.
 - Some caption timing is approximate; a media file passing decode checks does not prove teaching quality.
 - This is a local development application, not a hardened public multi-user service.
-- No root project license file is currently present; bundled assets can have separate terms.
+- The project code is MIT licensed; third-party libraries, fonts, logos, and media retain their own terms.
 
+
+## License
+
+Original project code and documentation are available under the [MIT License](LICENSE). Third-party dependencies and assets retain their own licenses; see [third-party notices](THIRD_PARTY_NOTICES.md).

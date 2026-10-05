@@ -59,3 +59,7 @@ run_job_search.py
 
 # Ensure bundled fonts are committed (needed for offline Remotion render)
 !src/remotion/fonts/
+
+# Generated Python bytecode
+__pycache__/
+*.py[cod]

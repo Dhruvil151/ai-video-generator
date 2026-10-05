@@ -1,0 +1,23 @@
+{
+  "sourceFile": "elasticsearch_inverted_index_40.mp4",
+  "sourceSHA256": "78a23abfd8cc114d887a38b8a9b928e35be93b22817fc809c3ee10f6c4d144fb",
+  "excerptStartSeconds": 41.012,
+  "excerptEndSeconds": 81,
+  "duration": 40,
+  "bytes": 731238,
+  "streams": [
+    {
+      "type": "video",
+      "codec": "h264",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "type": "audio",
+      "codec": "aac",
+      "sampleRate": "48000"
+    }
+  ],
+  "decodeCheck": "passed",
+  "note": "Existing local render; not a new live provider run or screen recording. Audio stream decoded; subjective listening was not assessed."
+}

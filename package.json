@@ -1,7 +1,7 @@
 {
   "name": "ai-educational-video-generator",
   "version": "1.0.0",
-  "description": "Zero-cost AI-powered educational video generator using Gemini, Edge-TTS, Remotion, and BullMQ.",
+  "description": "Educational video generation with editable storyboards, background rendering, and reusable scene components.",
   "type": "module",
   "scripts": {
     "test:local": "node --test server/tests/*.test.js",
