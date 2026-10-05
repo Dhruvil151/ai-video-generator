@@ -10,6 +10,12 @@ For someone making an explainer, it brings scripting, scene selection, speech, a
 
 [Quick start](#try-it-locally) · [Architecture](#how-it-is-built) · [Recorded validation](IMPLEMENTATION_STATUS.md) · [Portfolio](https://github.com/Dhruvil151)
 
+## See an animation sample
+
+![Offline cache demonstration rendered by this project](docs/video-preview.gif)
+
+A real render of the included, deterministic cache demonstration. This silent sample uses a test fixture; it is not a freshly AI-generated lesson or a voice-quality demonstration. [Download the MP4](docs/demo-cache.mp4) · [How to reproduce it](docs/PREVIEW.md).
+
 ## A simple example
 
 Enter “JavaScript closures.” The app asks Gemini for a teaching plan and visual storyboard. Review the narration and scenes, edit the JSON if needed, and submit a background render. Speech synthesis, React-based animation, and video assembly produce the downloadable result.
